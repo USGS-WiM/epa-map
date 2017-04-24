@@ -155,6 +155,13 @@ require([
     }, "locateButton");
     locate.startup();
 
+    on(locate, "locate", function(response) {
+        console.log("location returned");
+    });
+    
+
+    
+
     measurement = new Measurement({
         map: map,
         advancedLocationUnits: true
@@ -373,10 +380,10 @@ require([
             return;
         }
 
-        if (bufferClicked == true) {
+        /*if (bufferClicked == true) {
             bufferClicked = false;
             return;
-        }
+        }*/
 
         if (measurement.activeTool != null) {
             return;//
@@ -418,7 +425,7 @@ require([
                             $("#ecoThree").text(attr["NA_L3NAME"]);
                             symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
                                 new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-                                    new dojo.Color([255,0,225]), 2), new dojo.Color([98,194,204,0])
+                                    new dojo.Color([0,0,0]), 2), new dojo.Color([0,0,0,0])
                             );
                         } if (response[i].layerId == 2) {
                             $("#unitId").text(attr["Unit"]);
@@ -443,7 +450,7 @@ require([
                                     if (instance.isPinned() == true) {
                                         instance.unpin();
                                     }
-                        } if (response[i].layerId == 2) {
+                        } if (response[i].layerId == 3) {
                                 symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
                                 new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
                                     new dojo.Color([0,0,0]), 2), new dojo.Color([0,0,0,0])
@@ -715,7 +722,7 @@ require([
         $('#legendElement').css('max-height', maxLegendHeight);
         $('#legendDiv').css('max-height', maxLegendDivHeight);
 
-        $('#legendCollapse').on('shown.bs.collapse', function () {
+/*        $('#legendCollapse').on('shown.bs.collapse', function () {
             if (legendDiv.innerHTML.length == 0 ) {
                 var legend = new Legend({
                     map: map,
@@ -724,15 +731,8 @@ require([
                 legend.startup();
 
                 $("#legendDiv").niceScroll();
-
-                /*legend.addCallback(function(response) { 
-                    maxLegendHeight =  ($('#mapDiv').height()) * 0.90;
-                    $('#legendElement').css('max-height', maxLegendHeight);
-                    maxLegendDivHeight = ($('#legendElement').height()) - parseInt($('#legendHeading').css("height").replace('px',''));
-                    $('#legendDiv').css('max-height', maxLegendDivHeight);
-                });*/
             }
-        });
+        });*/
 
         $('#legendCollapse').on('hide.bs.collapse', function () {
             $('#legendElement').css('height', 'initial');
