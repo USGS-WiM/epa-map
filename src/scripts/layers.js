@@ -29,15 +29,15 @@ require([
 
     allLayers = [
         {
-            'groupHeading': 'ESRI dynamic map services',
-            'showGroupHeading': false,
+            'groupHeading': 'Ecoregions of North America',
+            'showGroupHeading': true,
             'includeInLayerList': true,
             'layers': {
-                'CBRS Units' : {
-                    'url': 'https://fws.wim.usgs.gov/arcgis/rest/services/CBRAMapper/GeoCBRA/MapServer',
-                    'visibleLayers': [2,4,5],
+                'Level 1' : {
+                    'url': 'https://maps4.arcgisonline.com/ArcGIS/rest/services/DOI/EPA_Ecoregions_of_North_America/MapServer',
+                    'visibleLayers': [1],
                     'options': {
-                        'id': 'cbrs',
+                        'id': 'levOne',
                         'opacity': 0.75,
                         'visible': true
                     },
@@ -47,68 +47,50 @@ require([
                         'includeInLayerList': true,
                         'zoomScale': 144448,
                         'hasOpacitySlider': true,
-                        'moreinfo': 'http://www.fws.gov/wetlands/Data/Wetlands-V2-Product-Summary.html',
                         'includeLegend' : true
                     }
                 },
-                'CBRS Footprints' : {
-                    'url': 'https://fws.wim.usgs.gov/arcgis/rest/services/CBRAMapper/GeoCBRA/MapServer',
-                    'visibleLayers': [0],
-                    'options': {
-                        'id': 'footprints',
-                        'opacity': 0.75,
-                        'visible': false
-                    },
-                    'wimOptions': {
-                        'type': 'layer',
-                        'layerType': 'agisDynamic',
-                        'includeInLayerList': false,
-                        'zoomScale': 144448,
-                        'hasOpacitySlider': true,
-                        'includeLegend' : false
-                    }
-                },
-                'two' : {
-                    'url': 'https://fws.wim.usgs.gov/arcgis/rest/services/CBRAMapper/GeoCBRA/MapServer',
+                'Level 2' : {
+                    'url': 'https://maps4.arcgisonline.com/ArcGIS/rest/services/DOI/EPA_Ecoregions_of_North_America/MapServer/',
                     'visibleLayers': [2],
                     'options': {
-                        'id': 'footprints',
+                        'id': 'levTwo',
                         'opacity': 0.75,
                         'visible': true
                     },
                     'wimOptions': {
                         'type': 'layer',
                         'layerType': 'agisDynamic',
-                        'includeInLayerList': false,
+                        'includeInLayerList': true,
                         'zoomScale': 144448,
                         'hasOpacitySlider': true,
                         'includeLegend' : false
                     }
                 },
-                'four' : {
-                    'url': 'https://fws.wim.usgs.gov/arcgis/rest/services/CBRAMapper/GeoCBRA/MapServer',
-                    'visibleLayers': [4],
+                'Level 3' : {
+                    'url': 'https://maps4.arcgisonline.com/ArcGIS/rest/services/DOI/EPA_Ecoregions_of_North_America/MapServer/',
+                    'visibleLayers': [3],
                     'options': {
-                        'id': 'footprints',
+                        'id': 'levThree',
                         'opacity': 0.75,
                         'visible': true
                     },
                     'wimOptions': {
                         'type': 'layer',
                         'layerType': 'agisDynamic',
-                        'includeInLayerList': false,
+                        'includeInLayerList': true,
                         'zoomScale': 144448,
                         'hasOpacitySlider': true,
-                        'includeLegend' : false
+                        'includeLegend' : true
                     }
                 },
-                'five' : {
-                    'url': 'https://fws.wim.usgs.gov/arcgis/rest/services/CBRAMapper/GeoCBRA/MapServer',
-                    'visibleLayers': [5],
+                'ecoregions' : {
+                    'url': 'https://maps4.arcgisonline.com/ArcGIS/rest/services/DOI/EPA_Ecoregions_of_North_America/MapServer/',
+                    'visibleLayers': [0],
                     'options': {
-                        'id': 'footprints',
+                        'id': 'ecoregions',
                         'opacity': 0.75,
-                        'visible': true
+                        'visible': false
                     },
                     'wimOptions': {
                         'type': 'layer',

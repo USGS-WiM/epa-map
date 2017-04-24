@@ -307,12 +307,12 @@ require([
     identifyParams.tolerance = 0;
     identifyParams.returnGeometry = true;
     identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_ALL;
-    identifyParams.layerIds = [0,2,4];
+    identifyParams.layerIds = [1,2,3];
     identifyParams.spatialReference = map.spatialReference;
     identifyParams.width  = map.width;
     identifyParams.height = map.height;
     //identifyTask = new esri.tasks.IdentifyTask("http://50.17.205.92/arcgis/rest/services/NAWQA/DecadalMap/MapServer");
-    identifyTask = new IdentifyTask(allLayers[0].layers["CBRS Units"].url);
+    identifyTask = new IdentifyTask(allLayers[0].layers["ecoregions"].url);
 
     //start LobiPanel
     $("#selectionDiv").lobiPanel({
@@ -390,9 +390,9 @@ require([
         identifyParams.geometry = evt.mapPoint;
         identifyParams.mapExtent = map.extent;
 
-        if (map.getLevel() >= 8) {
+        if (map.getLevel()) {
             //the deferred variable is set to the parameters defined above and will be used later to build the contents of the infoWindow.
-            identifyTask = new IdentifyTask(allLayers[0].layers["CBRS Units"].url);
+            identifyTask = new IdentifyTask(allLayers[0].layers["ecoregions"].url);
             var deferredResult = identifyTask.execute(identifyParams);
 
             setCursorByID("mainDiv");
@@ -412,27 +412,18 @@ require([
                         attr = feature.attributes;
                         
                         var symbol;
-                        if (response[i].layerId == 0) {
-                            $("#mapLink").html('<a href="' + attr["Map_Link"] + '" target="_blank">Click here for official CBRS map</a>');
-                            $("#mapDate").text(attr["Map_Date"]);
-                            $("#titleOne").text(attr["Title"]);
-                            $("#titleTwo").text(attr["Title_2"]);
-                            $("#titleThree").text(attr["Title_3"]);
+                        if (response[i].layerId == 1,2,3) {
+                            $("#ecoOne").text(attr["NA_L1NAME"]);
+                            $("#ecoTwo").text(attr["NA_L2NAME"]);
+                            $("#ecoThree").text(attr["NA_L3NAME"]);
                             symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
                                 new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
                                     new dojo.Color([255,0,225]), 2), new dojo.Color([98,194,204,0])
                             );
-                        } if (response[i].layerId == 4) {
+                        } if (response[i].layerId == 2) {
                             $("#unitId").text(attr["Unit"]);
                             $("#unitName").text(attr["Name"]);
                             $("#unitType").text(attr["Unit_Type"]);
-
-                            if (attr["Fast_Acres"] || attr["Wet_Acres"] !== ""){
-                                var totalAcre;
-                                totalAcre = Number(attr["Fast_Acres"]) + Number(attr["Wet_Acres"]) || "Data not available at this time";
-                            };
-
-                            $('#totalAcre').text(totalAcre);
             
                             symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
                                 new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
@@ -462,7 +453,7 @@ require([
                                     $('#aboutModal').modal('show');
                                     $('#aboutTab').trigger('click');*/
 
-                                $("#bufferDiv").css("visibility", "visible");
+                                /*$("#bufferDiv").css("visibility", "visible");
                                     var instance = $('#bufferDiv').data('lobiPanel');
                                     var docHeight = $(document).height();
                                     var docWidth = $(document).width();
@@ -475,7 +466,7 @@ require([
                                     instance.setPosition(instanceX, instanceY);
                                     if (instance.isPinned() == true) {
                                         instance.unpin();
-                         }
+                         }*/
                        }
 
 
@@ -1130,6 +1121,15 @@ require([
                     }
                 } else {
                     $('#' + groupDivID).append(button);
+                    if (wimOptions.moreinfo !== undefined && wimOptions.moreinfo) {
+                        var id = "#info" + camelize(layerName);
+                        var moreinfo = $(id);
+                        moreinfo.click(function(e) {
+                            window.open(wimOptions.moreinfo, "_blank");
+                            e.preventDefault();
+                            e.stopPropagation();
+                        });
+                    }
                     if ($("#opacity"+camelize(layerName)).length > 0) {
                         $("#opacity"+camelize(layerName)).click(function (e) {
                             e.preventDefault();

@@ -489,8 +489,8 @@ input[type="checkbox"], input[type="radio"] {
 
 .siteInfoClass {
     position:absolute;
-    width:500px;
-    height:500px;
+    width:450px;
+    height:200px;
     z-index:2;
     color: black;
     background-color: rgb(255,255,255);
@@ -544,40 +544,6 @@ input[type="checkbox"], input[type="radio"] {
     padding-right: 6px;
     font-size: 14px;
     font-weight: bold;
-}
-
-.squareFour {
-  width: 18%;
-  float: right;
-  outline-style: solid;
-  outline-width: 4px;
-  outline-color:#FFFF00;
-  position: relative;
-  right: 25px;
-  bottom: 120px;
-}
-
-.squareFour:after {
-  content: "";
-  display: block;
-  padding-bottom: 100%;
-}
-
-.squareZero {
-  width: 18%;
-  outline-style: solid;
-  outline-width: 4px;
-  outline-color:#ff00e1;
-  float: right;
-  position: relative;
-  bottom: 120px;
-  right: 25px;
-}
-
-.squareZero:after {
-  content: "";
-  display: block;
-  padding-bottom: 100%;
 }
 
 .layerHelp {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>CBRS Mapper</title>
+        <title>EPA - Ecoregions of North America</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
@@ -65,12 +65,12 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="https://www.fws.gov">
-                        <img id="fwsLogo" alt="FWS logo" src="images/fwsLogo.png" style="padding: 10px 0 0 0;">
-                        <a class="navbar-brand" target="_blank" href="http://www.fws.gov/cbra">
+                        <!--<img id="fwsLogo" alt="FWS logo" src="images/epa_logo.jpg" style="padding: 10px 0 0 0;">-->
+                        <a class="navbar-brand" target="_blank" href="#">
                             <div id="titles">
                                 <div class='hidden-lg hidden-md hidden-sm' style='font-size:20px;'>CBRS</div>
-                                <div class='hidden-xs' style='font-size:20px;'>Coastal Barrier Resources System Mapper</div>
-                                <div class='hidden-xs' style='font-size:14px;'>U.S Fish & Wildlife Service</div>
+                                <div class='hidden-xs' style='font-size:20px;'>Ecoregions of North America</div>
+                                <div class='hidden-xs' style='font-size:14px;'>Environmental Protection Agency</div>
                             </div>
                         </a>
                     </a>
@@ -81,10 +81,10 @@
                     <span id="geosearchButtonText"> Find Location</span>
                 </button>
 
-                <button id="cbrsNav" type="button" class="btn btn-primary navbar-btn pull-right">
+                <!--<button id="cbrsNav" type="button" class="btn btn-primary navbar-btn pull-right">
                     <span class="glyphicon glyphicon-search"></span>
                     <span id="geosearchButtonText"> Find CBRS Unit</span>
-                </button>
+                </button>-->
 
                 <button id="aboutNav" class  ="btn btn-default navbar-btn pull-right">
                     <i class="fa fa-question-circle"></i><span class="hidden-xs">&nbsp;&nbsp;About</span>
@@ -345,7 +345,7 @@
                         </div>
                         <div id="layersPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="layersPanelHeader">
                             <div id="toggle" style="padding: 2px 2px;"></div>
-                            <div class="layerHelp">Click <a class="showAboutModal" style="cursor:pointer;">here</a> to learn more about CBRS Units.</div>
+                            <!--<div class="layerHelp">Click <a class="showAboutModal" style="cursor:pointer;">here</a> to learn more about CBRS Units.</div>-->
                         </div>
                     </div>
                     <!-- # closing div tag for accordion style panels -->
@@ -373,26 +373,12 @@
                                     <br>
                                         <div>
                                             <ul style="list-style-type: none;">
-                                                <li>CBRS Unit: <label id="unitId"></label></li>
-                                                <li>Unit Name: <label id="unitName"></label></li>
-                                                <li data-toggle="tooltip" title="The Coastal Barrier Resources System (CBRS) contains two types of mapped units, System Units and Otherwise Protected Areas (OPAs). OPAs are denoted with a 'P' at the end of the unit designation (e.g., FL-64P, P10P). Most new Federal expenditures and financial assistance, including Federal flood insurance, are prohibited within System Units, while the only Federal spending prohibition within OPAs is on Federal flood insurance.">Unit Type: <label id="unitType"></label>&nbsp<span class="glyphicon glyphicon-info-sign" style="font-size: 11px"></span></li>
-                                                <li>Total Acreage: <label id="totalAcre"></label></li>
+                                                <li>Ecoregion 1: <label id="ecoOne"></label></li>
+                                                <li>Ecoregion 2: <label id="ecoTwo"></label></li>
+                                                <li>Ecoregion 3: <label id="ecoThree"></label></li>
                                             </ul>
                                             <div class="squareFour"></div>
                                         </div>
-                                    <br>
-                                        <div>
-                                            <ul style="list-style-type: none;">
-                                                <li>Map Link: <label id="mapLink"></label></li>
-                                                <li>Map Date: <label id="mapDate"></label></li>
-                                                <li>Title: <label id="titleOne"></label></li>
-                                                <li>Title 2: <label id="titleTwo"></label></li>
-                                                <li>Title 3: <label id="titleThree"></label></li>
-                                            </ul>
-                                            <div class="squareZero"></div>
-                                        </div>
-                                    <P class="panel-body">CBRS units extend seaward out to either the 20 or 30 foot bathymetric contour (depending on the location of the unit). <strong>The true seaward extent of the units is not shown in the CBRS mapper</strong>. For additional information, please contact <a href="mailto:cbra@fws.gov" target="_blank">CBRA@fws.gov</a></p>
-                                    <br>
                                     <br>
                                 </div>
                             </div>
@@ -423,16 +409,15 @@
                     <!-- End PopUp -->
 
                         <div id="legendElement" class="panel panel-default legendClass">
-                            <div class="legendHeading">
+                            <div class="legendHeading" role="tab">
                                 <h4 class="panel-title">
-                                    <a style="text-decoration: none" aria-expanded="true">
+                                    <a data-toggle="collapse" style="text-decoration: none"  href="#legendCollapse" aria-expanded="true" aria-controls="collapseOne">
                                         <span class="glyphicon glyphicon-list"></span>
                                         Legend
                                     </a>
                                 </h4>
                             </div>
-                            <div id="legendCollapse" role="tabpanel" aria-labelledby="headingOne">
-                                <h4 class="cbrsLegendTitle"> CBRS Units</h4>
+                            <div id="legendCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
                                 <div id="legendDiv" style="background-color:transparent;" class="panel-body"></div>
                             </div>
                         </div>
