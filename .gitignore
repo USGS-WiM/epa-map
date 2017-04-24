@@ -1,0 +1,8 @@
+node_modules
+*.log
+
+bower_components
+.idea/*
+
+vscode
+.vscode/*
