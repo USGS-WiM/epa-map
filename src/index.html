@@ -65,7 +65,7 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="https://www.fws.gov">
-                        <img id="fwsLogo" alt="FWS logo" src="images\usgs-logo.png">
+                        <img src="images\usgs-logo_left.png">
                         <a class="navbar-brand" target="_blank" href="#">
                             <div id="titles">
                                 <div class='hidden-lg hidden-md hidden-sm' style='font-size:20px;'>USGS Regions POC</div>
@@ -75,14 +75,19 @@
                     </a>
                 </div>
 
-               <button id="geosearchNav" type="button" class="btn btn-primary navbar-btn pull-right">
+                <button id="geosearchNav" type="button" class="btn btn-primary navbar-btn pull-right">
                     <span class="glyphicon glyphicon-search"></span>
                     <span id="geosearchButtonText"> Find Location</span>
                 </button>
 
-                <!--<button id="cbrsNav" type="button" class="btn btn-primary navbar-btn pull-right">
-                    <span class="glyphicon glyphicon-search"></span>
-                    <span id="geosearchButtonText"> Find CBRS Unit</span>
+                <!--<button id="printNavButton" type="button" class="btn btn-primary navbar-btn pull-right">
+                    <span class="glyphicon glyphicon-print"></span>
+                    <span id="printButtonText"> Print</span>
+                </button>
+
+                <button id="getDataButton" type="button" class="btn btn-primary navbar-btn pull-right">
+                    <span class="glyphicon glyphicon-cloud-download"></span>
+                    <span id="getDataButtonText"> Get Data</span>
                 </button>-->
 
                 <button id="aboutNav" class  ="btn btn-default navbar-btn pull-right">
@@ -109,133 +114,26 @@
                         <h4 class="modal-title">Find Location</h4>
                     </div>
                     <div class="modal-body">
+                        <label style="font-weight: normal">Enter a street address, city or place name<br/>For coordinates, enter decimal degrees in Longitude, Latitude format</label>
                         <div class="form-group">
-                            <div id="geosearch" align="center"></div>
-                            <br>
-                            <div align="center">
-                                <p>Search provided by <a href="https://txpub.usgs.gov/dss/search_api/2.0/" target="_blank">USGS Search Javascript API</a></p>
-                            </div>
-                        </div>
-                        <form id="geosearch-form" class="form-inline">
-                            <!--<button id="btnGeosearch" type="button" class="search-api-button; btn btn-success btn-fixed" data-dismiss="modal"> Go </button>-->
-                            <button id="btnDismiss" type="submit" class="btn btn-default btn-fixed" data-dismiss="modal">Dismiss</button>
-                        </form>
-                    </div>
-                </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-        </div>
-
-<!--CBRS Unit Search -->
-        <div class="modal fade overflow-y-hidden" id="cbrsModal" style="display: none;" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title">Find CBRS Unit</h4>
-                    </div>
-                    <div class="modal-body">
-                            <div class="form-group" style="outline:none;">
-                                <div class="search-api-container search-api-md" style="margin:auto">
-                                    <span class="search-api-button"><svg focusable="false" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg></span>
-                                    <span>
-                                        <input type="text" id="searchText" placeholder="Enter CBRS unit number (e.g Q01P)">
-                                    </span>
-                                    <span class="search-api-spinner search-api-spinner-hidden"></span>
-                                </div>
-                            </div>
-                                <form id="cbrs-form" class="form-inline">
-                                    <button id="btnUnitSearch" type="button" class="btn btn-success btn-fixed" data-dismiss="modal" on> Go </button>
-                                    <button id="btnunitDismiss" type="submit" class="btn btn-default btn-fixed" data-dismiss="modal">Dismiss</button>
-                                </form>
-                    </div>
-                </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-        </div>
-
-        <!-- Notifying User of Invalid Search -->
-        <div id="invalidSearchModal" aria-hidden="true" class="modal fade overflow-y-hidden">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header"><h4>Sorry, no results. Please try again.</h4>
-                    </div>
-                    <div class="modal-body"><p>The CBRS contains two types of units, System units and Otherwise Protected Areas (OPAs).  OPAs are denoted with a "P" at the end of the unit number (e.g., FL-64P, P10P).</p>
-                        <p>For more information <a href="https://www.fws.gov/ecological-services/habitat-conservation/cbra/Act/index.html" target="_blank">visit our site</a>.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Dismiss</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!--CBRS Unit Search -->
-
-        <!-- Notifying User of Invalid Location Search -->
-        <div id="invalidSearchLocationModal" aria-hidden="true" class="modal fade overflow-y-hidden">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header"><h4 id="test">Sorry, no results. Please try again.</h4>
-                    </div>
-                    <div class="modal-body">
-                        <h5 style="text-align: center">Here's a list of our supported Search Strings:</h5>
-                            <li>Street Address</li>
-                            <li>States</li>
-                            <li>Zip Codes</li>
-                            <li>Area Codes</li>
-                            <li>Lat/Long (i.e. '43.9,-72.1')</li>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Dismiss</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!--CBRS Unit Search -->
-
-        <!--<div class="modal fade overflow-y-hidden" id="geosearchModal" style="display: none;" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title">Find CBRS</h4>
-                    </div>
-                    <div class="modal-body">
-                        <label style="font-weight: normal">Enter a CBRS Unit ID</label>
-                        <div class="form-group">
-                            <div id="unitsearch"><div id="sapi_searchTextBoxDiv"></div></div>
+                            <div id="geosearch"><div id="sapi_searchTextBoxDiv"></div></div>
                         </div>
                         <form id="geosearch-form" class="form-inline">
                             <button id="btnGeosearch" type="button" class="btn btn-success btn-fixed" data-dismiss="modal"> Go </button>
                             <button id="btnDismiss" type="submit" class="btn btn-default btn-fixed" data-dismiss="modal">Dismiss</button>
                         </form>
                     </div>
-                </div>
-            </div>
-        </div>-->
-
-        <div class="modal fade overflow-y-hidden" id="printModal" style="display: none;" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title"><span class="glyphicon glyphicon-print"></span> Print Map</h4>
-                    </div>
-                    <div id="printModalBody" class="modal-body">
-
-                        <form id="print-title-form" class="form-group">
-                            <label for="printTitle">Title </label>
-                            <input class="form-control" id="printTitle" placeholder="Enter a title for your printout">
-                        <!--</form>
-
-                        <form id="print-form" class="form-inline">-->
-                            <button id="printExecuteButton" type="submit" class="btn btn-success btn-fixed" data-loading-text="Printing..." > Print </button>
-                            <button id="printDismissButton" type="button" class="btn btn-default btn-fixed" data-dismiss="modal"> Dismiss</button>
-                        </form>
-
-                        <div id="printJobsDiv" style="margin-top: 5px;"><label>Print Jobs </label><p class="toRemove"> No print jobs yet</p></div>
-                    </div>
                 </div><!-- /.modal-content -->
             </div><!-- /.modal-dialog -->
         </div>
+
+        <script>
+        $(".close-alert").click(function(){
+            $(this).parent().slideUp(250);
+            map.getLayer("huc8").setVisibility(false);
+            map.graphics.clear();
+        });
+        </script>
         <style>
             .close-alert:hover{
                 cursor: pointer;
@@ -251,43 +149,38 @@
                     </div>
                     <div id="aboutModalBody" class="modal-body">
                         <ul class="nav nav-tabs" id="aboutModalTabs">
-                            <li role="presentation" class="active"><a id="aboutTab" href="#aboutTabPane" data-toggle="tab"><i class="fa fa-question-circle"></i>&nbsp;About</a></li>
-                            <li role="presentation"><a id="contactTab" href="#contactTabPane" data-toggle="tab"><i class="fa fa-exclamation-circle"></i>&nbsp;Contact Us</a></li>
+                            <li role="presentation" class="active"><a id="aboutTab" href="#aboutTabPane" data-toggle="tab"><i class="fa fa-question-circle"></i>&nbsp;About the Application</a></li>
+                            <li role="presentation"><a id="userCautionTab" href="#contactTab" data-toggle="tab"><i class="fa fa-exclamation-circle"></i>&nbsp;Contact Us</a></li>
                         </ul>
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="aboutTabPane"></br>
-                            <h3>About</h3>
-                                 <p>Bacon ipsum dolor amet kielbasa cupim flank, shoulder corned beef salami beef ribs filet mignon jerky chicken pancetta capicola spare ribs boudin bresaola.</p>
-
-                                 <p>Turkey brisket frankfurter venison bacon ground round drumstick short ribs sausage. Shankle pancetta pastrami short ribs, meatball sirloin ribeye cow kevin tri-tip. Venison beef ribs turducken swine. Meatloaf jerky strip steak sirloin beef turkey fatback tri-tip frankfurter.</p>
+                                <!--<p  style="color:black; font-size: larger">App Info is below. This could be a subtitle space.</p>-->
+                                <p>Bacon ipsum dolor amet turkey burgdoggen corned beef, andouille flank ribeye pancetta hamburger venison filet mignon ham hock pork picanha alcatra chuck.</p>
+                                <p>Venison bacon ground round pancetta bresaola pig, pastrami kielbasa frankfurter beef tail. T-bone prosciutto pork doner shoulder chicken chuck beef ribs corned beef tenderloin alcatra kielbasa.</p>
+                                <p>Salami picanha porchetta biltong. Burgdoggen ham hock rump, kevin tail chicken swine doner.</p>
+                                <p>Chuck doner boudin, tongue jerky cupim frankfurter ground round biltong venison.:</p>
+                                <br>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="contactTabPane"></br>
-                                <h3>Contact Us</h3>
-                                    <p>Bacon ipsum dolor amet kielbasa cupim flank, shoulder corned beef salami beef ribs filet mignon jerky chicken pancetta capicola spare ribs boudin bresaola.</p>
-                                                                   
-                                    <p>Frankfurter pancetta shankle hamburger. Tenderloin pork belly pork filet mignon corned beef. Turkey brisket frankfurter venison bacon ground round drumstick short ribs sausage. Shankle pancetta pastrami short ribs, meatball sirloin ribeye cow kevin tri-tip. Venison beef ribs turducken swine. Meatloaf jerky strip steak sirloin beef turkey fatback tri-tip frankfurter.</p>
-
+                            <div role="tabpanel" class="tab-pane" id="disclaimerTabPane"></br>
+                                <h3>Disclaimer</h3>
+                                <p>Jerky porchetta sirloin tenderloin chicken rump boudin pastrami flank landjaeger drumstick corned beef sausage. Boudin kevin strip steak picanha short ribs pastrami. Meatloaf cupim kielbasa tenderloin. Shank meatloaf landjaeger pig venison filet mignon short ribs.</p>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="dataLimitationsTabPane"></br>
-                                
+                            <div role="tabpanel" class="tab-pane" id="contactTab"></br>
+                                <h3>Contact</h3>
+                                <p>Bacon ipsum dolor amet turkey burgdoggen corned beef, andouille flank ribeye pancetta hamburger venison filet mignon ham hock pork picanha alcatra chuck. Venison bacon ground round pancetta bresaola pig, pastrami kielbasa frankfurter beef tail. T-bone prosciutto pork doner shoulder chicken chuck beef ribs corned beef tenderloin alcatra kielbasa.</p>
+                                <p>Salami picanha porchetta biltong. Burgdoggen ham hock rump, kevin tail chicken swine doner.</p>
+                                <p>Chuck doner boudin, tongue jerky cupim frankfurter ground round biltong venison.:</p>
+                                <div id="info"></div>
+                            </div>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button class=" btn btn-default close" type="button" data-dismiss="modal" aria-hidden="true" style="color:gray;" class="btn btn-default">Dismiss</button>
+                        <button class=" btn btn-default close" type="button" data-dismiss="modal" aria-hidden="true" style="color:gray;" class="btn btn-default">Close</button>
                     </div>
                 </div><!-- /.modal-content -->
             </div> <!-- /.modal-dialog -->
-        </div><!-- /.modal -->			
-         <style>		
-             .close-alert:hover{		
-                 cursor: pointer;		
-             }		
-         </style>				
- 		
-                 </div><!-- /.modal-content -->		
-             </div> <!-- /.modal-dialog -->		
-         </div><!-- /.modal -->
+        </div><!-- /.modal -->
 
         <!-- Begin page content -->
         <div class="container-fluid keepit100">
@@ -313,7 +206,7 @@
                                 </a>
                             </h4>
                         </div>
-                        <div id="basemapsPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="basemapsHeader">
+                        <div id="basemapsPanel" role="tabpanel" aria-labelledby="basemapsHeader">
                             <div class="panel-body collapse in">
                                 <button id="btnStreets" class="btn btn-default basemapBtn equalize"><img class="basemapThumb" alt="" src="images/streets.jpg"><br class="basemapThumb">Streets</button>
                                 <button id="btnSatellite" class="btn btn-default basemapBtn equalize" ><img class="basemapThumb" alt="" src="images/satellite.jpg"><br class="basemapThumb">Satellite</button>
@@ -324,7 +217,6 @@
                                 <button id="btnOSM" class="btn btn-default basemapBtn equalize"><img class="basemapThumb" alt="" src="images/osm.jpg"><br class="basemapThumb">Open Street Map</button>
                                 <button id="btnNatGeo" class="btn btn-default basemapBtn equalize"><img class="basemapThumb" alt="" src="images/natgeo.jpg"><br class="basemapThumb">NatGeo</button>
                                 <button id="btnUsgsTopo" class="btn btn-default basemapBtn equalize"><img class="basemapThumb" alt="" src="images/usgs_topo.jpg"><br class="basemapThumb">USGS Topo</button>
-                                <button id="btnUsgsImgTopo" class="btn btn-default basemapBtn equalize"><img class="basemapThumb" alt="" src="images/usgs_imagerytopo.jpg"><br class="basemapThumb">USGS Imagery Topo</button>
                                 <button id="btnNatlMap" class="btn btn-default basemapBtn equalize"><img class="basemapThumb" alt="" src="images/national_map.jpg"><br class="basemapThumb">Nat'l Map</button>
                             </div>
 
@@ -333,7 +225,7 @@
                     <!--<div class="panel panel-default wim-sidebar-panel">
                         <div class="panel-heading" id="layersPanelHeader">
                             <h4 class="panel-title">
-                                <a class="collapsed" data-toggle="src" href="#layersPanel" aria-expanded="true" aria-controls="layersPanel">
+                                <a class="collapsed" data-toggle="collapse" href="#layersPanel" aria-expanded="true" aria-controls="layersPanel">
                                     Map Layers
                                 </a>
                             </h4>
@@ -355,55 +247,8 @@
 
                     <div id="mapDiv">
 
-                    <!-- CBRS Unit Selection Pop Up-->
-                    <div>
-                        <div id="selectionDiv" class="panel panel-defaults siteInfoClass">
-                            <div class="panel-heading">
-                                <div class="panel-title">
-                                    <h4 id="siteInfoPanelHeader">Site Information</h4>
-                                </div>
-                            </div>
-                                <div class="panel-group">
-                                    <br>
-                                        <div>
-                                            <ul style="list-style-type: none;">
-                                                <li>Ecoregion 1: <label id="ecoOne"></label></li>
-                                                <li>Ecoregion 2: <label id="ecoTwo"></label></li>
-                                                <li>Ecoregion 3: <label id="ecoThree"></label></li>
-                                            </ul>
-                                            <div class="squareFour"></div>
-                                        </div>
-                                    <br>
-                                </div>
-                            </div>
-                        </div>
-                    <!-- End PopUp -->
-
-                    <!--CBRS Unit Buffer Zone Pop Up-->
-                    <div>
-                        <div id="bufferDiv" class="panel panel-defaults bufferInfoClass">
-                            <div class="panel-heading">
-                                <div class="panel-title" style="margin-left: 25%;">
-                                    <h4 id="siteInfoPanelHeader" style="font-weight: bold;">CBRS Unit Buffer Zone</h4>
-                                </div>
-                            </div>
-                                <div class="panel-group">
-                                    <br>
-                                        <div class="panel-body">
-                                            <p>You have clicked within the CBRS Buffer Zone. The CBRS Buffer Zone represents the area immediately adjacent to the CBRS boundary where users are advised to contact the U.S. Fish and Wildlife Service for an official determination as to whether the property or project site is located “in” or “out” of the CBRS. For information on obtaining an official CBRS property determination, please visit: <a href="http://www.fws.gov/cbra/Determinations.html">http://www.fws.gov/cbra/Determinations.html</a>.
-                                                <br>
-                                                For more information on project consultations, please visit: <a href="http://www.fws.gov/cbra/Consultations.html">http://www.fws.gov/cbra/Consultations.html</a>.</p>
-                                                <br>
-                                                <div><img class="fwslogo" src="images/fwsLogo.png"/></div>
-                                                <p style="padding-top: 15px;">For more information on project consultations, please visit: <a href="http://www.fws.gov/cbra/Consultations.html">http://www.fws.gov/cbra/Consultations.html</a>.</p>
-                                        </div>
-                                </div>
-                            </div>
-                        </div>
-                    <!-- End PopUp -->
-
-                        <!--<div id="legendElement" class="panel panel-default legendClass">
-                            <div class="legendHeading" role="tab">
+                        <div id="legendElement" class="panel panel-default legendClass">
+                            <div id="legendHeading" class=" legendHeading" role="tab">
                                 <h4 class="panel-title">
                                     <a data-toggle="collapse" style="text-decoration: none"  href="#legendCollapse" aria-expanded="true" aria-controls="collapseOne">
                                         <span class="glyphicon glyphicon-list"></span>
@@ -412,21 +257,21 @@
                                 </h4>
                             </div>
                             <div id="legendCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-                                <div id="legendDiv" style="background-color:transparent;" class="panel-body"></div>
+                                <div id="legendDiv" class="panel-body"></div>
                             </div>
-                        </div>-->
+                        </div>
 
                         <div id="measurementElement" class="panel panel-default measurementClass">
-                            <div  id="measurementHeading" class="measurementHeading" role="tab"  data-toggle="collapse"   href="#measurementCollapse" aria-expanded="true" aria-controls="collapseOne">
+                            <div id="measurementHeading" class="measurementHeading" role="tab">
                                 <h4 class="panel-title">
-                                    <a style="text-decoration: none">
+                                    <a data-toggle="collapse" style="text-decoration: none"  href="#measurementCollapse" aria-expanded="true" aria-controls="collapseOne">
                                         <i class="fa fa-ellipsis-h"></i>
                                         <span id="measureLabel">Measure</span>
                                     </a>
                                 </h4>
                             </div>
-                            <div  onclick="message()" id="measurementCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-                                <div id="measurementDiv" class="panel-body"></div><p id="helpfulHint"></p>
+                            <div id="measurementCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
+                                <div id="measurementDiv" class="panel-body"></div>
                                 <!--<span id="snappingLabel" style="font-size:smaller;padding:5px 5px;">Press <b>CTRL</b> to enable snapping.</span>-->
                             </div>
                         </div>
@@ -441,7 +286,7 @@
                         1:<span id="scale"></span> <br>
                         <span class="hover-content"><b>Latitude</b></span>
                         <span id="latitude">y</span> |
-                        <span class="hover-content"><b>Longitude</b></span>
+                        <span class="hover-content"> <b>Longitude</b></span>
                         <span id="longitude">x</span>
                         <span id="mapCenterLabel"  class="hover-content"> (center)</span>
                     </div>

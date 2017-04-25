@@ -16,8 +16,7 @@ var measurement;
 
 var identifyTask, identifyParams;
 
-var cbrsClicked = false;
-var bufferClicked = false;
+var aoiClicked = false;
 
 require([
     'esri/map',
@@ -30,18 +29,16 @@ require([
     'esri/dijit/Measurement',
     'esri/dijit/PopupTemplate',
     'esri/graphic',
-    'esri/graphicsUtils',
     'esri/geometry/Extent',
     'esri/geometry/Multipoint',
     'esri/geometry/Point',
     'esri/layers/ArcGISTiledMapServiceLayer',
     'esri/renderers/UniqueValueRenderer',
     'esri/SpatialReference',
+    'esri/tasks/query', 
+    'esri/tasks/QueryTask',
     'esri/symbols/PictureMarkerSymbol',
     'esri/tasks/GeometryService',
-    'esri/tasks/FindTask',
-    'esri/tasks/FindParameters',
-    'esri/tasks/FindResult',
     'esri/tasks/IdentifyParameters',
     'esri/tasks/IdentifyTask',
     'esri/tasks/LegendLayer',
@@ -67,18 +64,16 @@ require([
     Measurement,
     PopupTemplate,
     Graphic,
-    graphicsUtils,
     Extent,
     Multipoint,
     Point,
     ArcGISTiledMapServiceLayer,
     UniqueValueRenderer,
     SpatialReference,
+    Query,
+    QueryTask,
     PictureMarkerSymbol,
     GeometryService,
-    FindTask,
-    FindParameters,
-    FindResult,
     IdentifyParameters,
     IdentifyTask,
     LegendLayer,
@@ -96,7 +91,6 @@ require([
 
     //bring this line back after experiment////////////////////////////
     //allLayers = mapLayers;
-
 
     esriConfig.defaults.io.corsEnabledServers.push("fwsmapper.wim.usgs.gov");
     esri.config.defaults.io.proxyUrl = "https://fwsmapper.wim.usgs.gov/serviceProxy/proxy.ashx";
@@ -137,12 +131,12 @@ require([
                             proxyUrl: "http://52.70.106.103/serviceProxy/proxy.ashx",
                             urlPrefix: "http://52.70.106.103/arcgis/rest/services/Historic_Wetlands"
                         });*/
-// unablet to add infoWindow: popup
+
     map = new Map('mapDiv', {
         basemap: 'hybrid',
-        extent: new Extent(-14638882.654811008, 2641706.3772205533, -6821514.898031538, 6403631.161302788, new SpatialReference({ wkid:3857 })),
+        extent: new Extent(-14638882.654811008, 2641706.3772205533, -6821514.898031538, 6403631.161302788, new SpatialReference({ wkid:3857 }))
     });
-    
+
     var home = new HomeButton({
         map: map,
         extent: new Extent(-14638882.654811008, 2641706.3772205533, -6821514.898031538, 6403631.161302788, new SpatialReference({ wkid:3857 }))
@@ -155,12 +149,92 @@ require([
     }, "locateButton");
     locate.startup();
 
-    on(locate, "locate", function(response) {
-        console.log("location returned");
-    });
+  on(locate, "locate", function(evt) {
+      
+        console.log("location returned:" + evt.position.coords.latitude);
+        console.log("location returned:" + evt.position.coords.longitude);
+
+        queryTask = new esri.tasks.QueryTask("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/ArcGIS/rest/services/USGS_Regions/FeatureServer/0?token=DjcX42N0ihSH--P-qYw5815P-YVYlkUM34RJhmOFAP6zuBPMZgYcr5vgDrpbXHUO7xgoIQtxY1upVC5Ro_PSxQj0hOJ_cVaLL1PDiY6GL9neK1F4Zt32o59F4JtVfnz2fAW8UjnX2cf1-nQiNj01agF_zDKFtF6M8xPmIFSZwoaY9O0RAvsWapQ_UwpzTXAN3ZRKGg-nM-tCaqiajg99JyrHABeY18mcw_BOFKTdWnczoYSWaoPigYJz_PU-XhPI");
+
+        query = new esri.tasks.Query();
+        query.returnGeometry = true;
+        query.outFields = ["Region", "Headqrtrs"];
+        
+        infoTemplate = new esri.InfoTemplate("USGS Region", "Region: ${Region}<br />Headquarters: ${Headqrtrs}");
+
+        query.geometry = evt.graphic.geometry;
+        queryTask.execute(query, showResults);
+    
     
 
-    
+      function showResults(featureSet) {
+        //remove all graphics on the maps graphics layer
+        map.graphics.clear();
+
+        //QueryTask returns a featureSet.  Loop through features in the featureSet and add them to the map.
+
+        if (featureSet.features.length > 0) {
+          
+         var feature = featureSet.features[0];
+
+          feature.setInfoTemplate(infoTemplate);
+          map.infoWindow.setFeatures([feature]);
+          map.infoWindow.show(new Point(evt.position.coords.longitude, evt.position.coords.latitude, new SpatialReference({ wkid: 4326 })));
+
+          //Set the infoTemplate.
+          /*graphic.setInfoTemplate(infoTemplate);*/
+
+          //Add graphic to the map graphics layer.
+          /*map.graphics.add(graphic);*/
+        
+        }
+      }
+
+        /*function showResults (results) {
+          var resultItems = [];
+          var resultCount = results.features.length;
+          for (var i = 0; i < resultCount; i++) {
+            var featureAttributes = results.features[i].attributes;
+            for (var attr in featureAttributes) {
+              resultItems.push("<b>" + attr + ":</b>  " + featureAttributes[attr] + "<br>");
+            }
+            resultItems.push("<br>");
+          }
+        }*/
+
+       /* feature.geometry.spatialReference = map.spatialReference;
+        var graphic = feature;
+        graphic.setSymbol(symbol);
+
+        map.graphics.add(graphic);*/
+
+        /*var feature;
+        var attr;
+        attr = feature.attributes;*/
+
+       /* var template = new esri.InfoTemplate("USGS Regions",
+            "<b>Region:</b> " + attr.Region + "<br/>" +
+            "<p><b>Headquarters:</b> " + attr.Headqrtrs + "<br/>" +
+            "<br/><p><a id='infoWindowLink' href='javascript:void(0)'>Zoom to wetland</a></p>");
+
+            feature.setInfoTemplate(template);
+
+            map.infoWindow.setFeatures([feature]);
+            map.infoWindow.show(evt.mapPoint, map.getInfoWindowAnchor(evt.screenPoint));
+
+            var infoWindowClose = dojo.connect(map.infoWindow, "onHide", function(evt) {
+                map.graphics.clear();
+                dojo.disconnect(map.infoWindow, infoWindowClose);
+            });
+
+            $("#infoWindowLink").click(function(event) {
+            var convertedGeom = webMercatorUtils.webMercatorToGeographic(feature.geometry);
+
+            var featExtent = convertedGeom.getExtent();
+
+            map.setExtent(featExtent, true);
+        });*/
+    });
 
     measurement = new Measurement({
         map: map,
@@ -177,7 +251,7 @@ require([
             maxLegendHeight =  ($('#mapDiv').height()) * 0.90;
             $('#legendElement').css('height', maxLegendHeight);
             $('#legendElement').css('max-height', maxLegendHeight);
-            maxLegendDivHeight = ($('#legendElement').height());
+            maxLegendDivHeight = ($('#legendElement').height()) - parseInt($('#legendHeading').css("height").replace('px',''));
             $('#legendDiv').css('max-height', maxLegendDivHeight);
         }
         else {
@@ -214,7 +288,15 @@ require([
     });*/
 
     //displays map scale on map load
-    
+    on(map, "load", function() {
+        var scale =  map.getScale().toFixed(0);
+        $('#scale')[0].innerHTML = addCommas(scale);
+        var initMapCenter = webMercatorUtils.webMercatorToGeographic(map.extent.getCenter());
+        $('#latitude').html(initMapCenter.y.toFixed(3));
+        $('#longitude').html(initMapCenter.x.toFixed(3));
+        //map.setBasemap("topo");
+        //map.setBasemap("hybrid");
+    });
     //displays map scale on scale change (i.e. zoom level)
     on(map, "zoom-end", function () {
         var scale =  map.getScale().toFixed(0);
@@ -240,150 +322,91 @@ require([
     });
     var usgsTopo = new ArcGISTiledMapServiceLayer('https://server.arcgisonline.com/ArcGIS/rest/services/USA_Topo_Maps/MapServer');
     var nationalMapBasemap = new ArcGISTiledMapServiceLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer');
-    var usgsImageryTopo = new ArcGISTiledMapServiceLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryTopo/MapServer');
     //on clicks to swap basemap. map.removeLayer is required for nat'l map b/c it is not technically a basemap, but a tiled layer.
     on(dom.byId('btnStreets'), 'click', function () {
         map.setBasemap('streets');
         map.removeLayer(nationalMapBasemap);
         map.removeLayer(usgsTopo);
-        map.removeLayer(usgsImageryTopo);
     });
     on(dom.byId('btnSatellite'), 'click', function () {
         map.setBasemap('satellite');
         map.removeLayer(nationalMapBasemap);
         map.removeLayer(usgsTopo);
-        map.removeLayer(usgsImageryTopo);
     });
     on(dom.byId('btnHybrid'), 'click', function () {
         map.setBasemap('hybrid');
         map.removeLayer(nationalMapBasemap);
         map.removeLayer(usgsTopo);
-        map.removeLayer(usgsImageryTopo);
     });
     on(dom.byId('btnTerrain'), 'click', function () {
         map.setBasemap('terrain');
         map.removeLayer(nationalMapBasemap);
         map.removeLayer(usgsTopo);
-        map.removeLayer(usgsImageryTopo);
     });
     on(dom.byId('btnGray'), 'click', function () {
         map.setBasemap('gray');
         map.removeLayer(nationalMapBasemap);
         map.removeLayer(usgsTopo);
-        map.removeLayer(usgsImageryTopo);
     });
     on(dom.byId('btnNatGeo'), 'click', function () {
         map.setBasemap('national-geographic');
         map.removeLayer(nationalMapBasemap);
         map.removeLayer(usgsTopo);
-        map.removeLayer(usgsImageryTopo);
     });
     on(dom.byId('btnOSM'), 'click', function () {
         map.setBasemap('osm');
         map.removeLayer(nationalMapBasemap);
         map.removeLayer(usgsTopo);
-        map.removeLayer(usgsImageryTopo);
     });
     on(dom.byId('btnTopo'), 'click', function () {
         map.setBasemap('topo');
         map.removeLayer(nationalMapBasemap);
         map.removeLayer(usgsTopo);
-        map.removeLayer(usgsImageryTopo);
     });
 
     on(dom.byId('btnNatlMap'), 'click', function () {
         map.addLayer(nationalMapBasemap, 1);
-        map.removeLayer(usgsTopo);
-        map.removeLayer(usgsImageryTopo);
-        map.removeLayer(usgsImageryTopo);
-    });
-
-    on(dom.byId('btnUsgsImgTopo'), 'click', function () {
-        map.addLayer(usgsImageryTopo, 1);
-        map.removeLayer(nationalMapBasemap);
         map.removeLayer(usgsTopo);
     });
 
     on(dom.byId('btnUsgsTopo'), 'click', function () {
         map.addLayer(usgsTopo, 1);
         map.removeLayer(nationalMapBasemap);
-        map.removeLayer(usgsImageryTopo);
     })
 
     identifyParams = new IdentifyParameters();
     identifyParams.tolerance = 0;
     identifyParams.returnGeometry = true;
     identifyParams.layerOption = IdentifyParameters.LAYER_OPTION_ALL;
-    identifyParams.layerIds = [1,2,3];
-    identifyParams.spatialReference = map.spatialReference;
     identifyParams.width  = map.width;
     identifyParams.height = map.height;
     //identifyTask = new esri.tasks.IdentifyTask("http://50.17.205.92/arcgis/rest/services/NAWQA/DecadalMap/MapServer");
-    identifyTask = new IdentifyTask(allLayers[0].layers["ecoregions"].url);
+    identifyTask = new IdentifyTask(allLayers[0].layers["USGS Regions"].url);
 
-    //start LobiPanel
-    $("#selectionDiv").lobiPanel({
-        unpin: false,
-        reload: false,
-        minimize: false,
-        close: false,
-        expand: false,
-        editTitle: false,
-        maxWidth: 800,
-        maxHeight: 500,
+    //code for adding draggability to infoWindow. http://www.gavinr.com/2015/04/13/arcgis-javascript-draggable-infowindow/
+    var handle = query(".title", map.infoWindow.domNode)[0];
+    var dnd = new Moveable(map.infoWindow.domNode, {
+        handle: handle
     });
-
-    $("#selectionDiv .dropdown").prepend("<div id='selectionClose' tite='close'><b>X</b></div>");
-    //$("#selectionDiv .dropdown").prepend("<div id='selectionMin' title='collapse'><b>_</b></div>");
-
-    $("#selectionMin").click(function(){
-        $("#selectionDiv").css("visibility", "hidden");
-        /*$("#selection-tools-alert").slideDown(250);*/
-    });
-
-    $("#selectionClose").click(function(){
-        $("#selectionDiv").css("visibility", "hidden");
-    });
-    //End LobiPanel
-
-    //start LobiPanel for Buffer
-    $("#bufferDiv").lobiPanel({
-        unpin: false,
-        reload: false,
-        minimize: false,
-        close: false,
-        expand: false,
-        editTitle: false,
-        maxWidth: 800,
-        maxHeight: 500,
-    });
-
-    $("#bufferDiv .dropdown").prepend("<div id='bufferClose' tite='close'><b>X</b></div>");
-    //$("#selectionDiv .dropdown").prepend("<div id='selectionMin' title='collapse'><b>_</b></div>");
-
-    /*$("#selectionMin").click(function(){
-        $("#bufferDiv").css("visibility", "hidden");
-        $("#selection-tools-alert").slideDown(250);
-    });*/
-
-    $("#bufferClose").click(function(){
-        $("#bufferDiv").css("visibility", "hidden");
-    });
-    //End LobiPanel
     
+    // when the infoWindow is moved, hide the arrow:
+    on(dnd, 'FirstMove', function() {
+        // hide pointer and outerpointer (used depending on where the pointer is shown)
+        var arrowNode =  query(".outerPointer", map.infoWindow.domNode)[0];
+        domClass.add(arrowNode, "hidden");
+        
+        var arrowNode =  query(".pointer", map.infoWindow.domNode)[0];
+        domClass.add(arrowNode, "hidden");
+    }.bind(this));
+    //end code for adding draggability to infoWindow
 
     //map click handler
     on(map, "click", function(evt) {
 
-        if (cbrsClicked == true) {
-            cbrsClicked = false;
+        if (aoiClicked == true) {
+            aoiClicked = false;
             return;
         }
-
-        /*if (bufferClicked == true) {
-            bufferClicked = false;
-            return;
-        }*/
 
         if (measurement.activeTool != null) {
             return;//
@@ -399,10 +422,10 @@ require([
 
         if (map.getLevel()) {
             //the deferred variable is set to the parameters defined above and will be used later to build the contents of the infoWindow.
-            identifyTask = new IdentifyTask(allLayers[0].layers["ecoregions"].url);
+            identifyTask = new IdentifyTask(allLayers[0].layers["USGS Regions"].url);
             var deferredResult = identifyTask.execute(identifyParams);
 
-            setCursorByID("mainDiv");
+            setCursorByID("mainDiv", "wait");
 
             deferredResult.addCallback(function(response) {
 
@@ -419,186 +442,353 @@ require([
                         attr = feature.attributes;
                         
                         var symbol;
-                        if (response[i].layerId == 1,2,3) {
-                            $("#ecoOne").text(attr["NA_L1NAME"]);
-                            $("#ecoTwo").text(attr["NA_L2NAME"]);
-                            $("#ecoThree").text(attr["NA_L3NAME"]);
+                        if (response[i].layerId == 0) {
+                            $("#mapLink").html('<a href="' + attr["Map_Link"] + '" target="_blank">Click Here</a>');
+                            $("#mapDate").text(attr["Map_Date"]);
+                            $("#titleOne").text(attr["Title"]);
+                            $("#titleTwo").text(attr["Title_2"]);
+                            $("#titleThree").text(attr["Title_3"]);
                             symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
                                 new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-                                    new dojo.Color([0,0,0]), 2), new dojo.Color([0,0,0,0])
+                                    new dojo.Color([255,0,225]), 2), new dojo.Color([98,194,204,0])
                             );
-                        } if (response[i].layerId == 2) {
+                        } if (response[i].layerId == 4) {
                             $("#unitId").text(attr["Unit"]);
                             $("#unitName").text(attr["Name"]);
                             $("#unitType").text(attr["Unit_Type"]);
+                            $("#dataTier").text(attr["Tier"]);
+
+                           if (attr["Tier"] == '2') {
+                                var totalAcre;
+                                totalAcre = Number(attr["Fast_Acres"]) + Number(attr["Wet_Acres"]);
+                            } else {
+                                totalAcre = "Data not available at this time";
+                            };
+                            
+                            $('#totalAcre').text(totalAcre);
             
                             symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
                                 new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
                                     new dojo.Color([255,225,0]), 2), new dojo.Color([98,194,204,0])
                             );
-                                $("#selectionDiv").css("visibility", "visible");
-                                    var instance = $('#selectionDiv').data('lobiPanel');
-                                    var docHeight = $(document).height();
-                                    var docWidth = $(document).width();
-                                    var percentageOfScreen = 0.9;
 
-                                    var instanceX = docWidth*0.5-$("#selectionDiv").width()*0.5;
-                                    var instanceY = docHeight*0.8-$("#selectionDiv").height()*1.0;
-
-
-                                    instance.setPosition(instanceX, instanceY);
-                                    if (instance.isPinned() == true) {
-                                        instance.unpin();
-                                    }
-                        } if (response[i].layerId == 3) {
-                                symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
-                                new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-                                    new dojo.Color([0,0,0]), 2), new dojo.Color([0,0,0,0])
-                            );
-
-                                    /*$('#contactTob').modal('hide');
-                                    $('#aboutModal').modal('show');
-                                    $('#aboutTab').trigger('click');*/
-
-                                /*$("#bufferDiv").css("visibility", "visible");
-                                    var instance = $('#bufferDiv').data('lobiPanel');
-                                    var docHeight = $(document).height();
-                                    var docWidth = $(document).width();
-                                    var percentageOfScreen = 0.9;
-
-                                    var instanceX = docWidth*0.5-$("#bufferDiv").width()*0.5;
-                                    var instanceY = docHeight*0.8-$("#bufferDiv").height()*1.0;
-
-
-                                    instance.setPosition(instanceX, instanceY);
-                                    if (instance.isPinned() == true) {
-                                        instance.unpin();
-                         }*/
-                       }
-
-
-                        feature.geometry.spatialReference = map.spatialReference;
-                        var graphic = feature;
-                        graphic.setSymbol(symbol);
-
-                        map.graphics.add(graphic);
-
+                            
+                            
+                            /*if (attr.Tier == 2){
+                                attr.totalAcreage = "Approximately" + (Number(attr.Fast_Acres + attr.Wet_Acres)) + "acres.";
+                            }*/
+                           
+                        }
                     }
+                    feature.geometry.spatialReference = map.spatialReference;
+                    var graphic = feature;
+                    graphic.setSymbol(symbol);
+
+                    map.graphics.add(graphic);
+
+                    var projmeta = '';
+                    if (attrStatus.SUPPMAPINFO == 'None') {
+                        projmeta = " NONE";
+                    } else {
+                        projmeta = " <a target='_blank' href='" + attrStatus.SUPPMAPINFO + "'>click here</a>";
+                    }
+
+                    if (attrStatus.IMAGE_DATE == "<Null>" || attrStatus.IMAGE_DATE == "0" || attrStatus.IMAGE_DATE == 0) {
+                        attrStatus.IMAGE_DATE = projmeta;
+                    }
+
+                    var template = new esri.InfoTemplate("Wetland",
+                        "<b>Classification:</b> " + attr.ATTRIBUTE + " (<a target='_blank' href='https://fwsmapper.wim.usgs.gov/decoders/SWI.aspx?CodeURL=" + attr.ATTRIBUTE + "''>decode</a>)<br/>"+
+                        "<p><b>Wetland Type:</b> " + attr.WETLAND_TYPE + "<br/>" +
+                        "<b>Acres:</b> " + Number(attr.ACRES).toFixed(2) + "<br/>" +
+                        "<b>Image Date(s):</b> " + attrStatus.IMAGE_DATE + "<br/>" +
+                        "<b>Project Metadata:</b>" + projmeta +
+                        "<br/><p><a id='infoWindowLink' href='javascript:void(0)'>Zoom to wetland</a></p>");
+
+                    //ties the above defined InfoTemplate to the feature result returned from a click event
+
+                    feature.setInfoTemplate(template);
+
+                    map.infoWindow.setFeatures([feature]);
+                    map.infoWindow.show(evt.mapPoint, map.getInfoWindowAnchor(evt.screenPoint));
+
+                    var infoWindowClose = dojo.connect(map.infoWindow, "onHide", function(evt) {
+                        map.graphics.clear();
+                        dojo.disconnect(map.infoWindow, infoWindowClose);
+                    });
 
                     setCursorByID("mainDiv", "default");
                     map.setCursor("default");
 
-                    }
+                    $("#infoWindowLink").click(function(event) {
+                        var convertedGeom = webMercatorUtils.webMercatorToGeographic(feature.geometry);
+
+                        var featExtent = convertedGeom.getExtent();
+
+                        map.setExtent(featExtent, true);
+                    });
+
+                    ////map.infoWindow.show(evt.mapPoint);
+
+                } else if (response.length <= 1) {
+
+                    identifyTask = new IdentifyTask(allLayers[0].layers["Riparian"].url);
+
+                    var deferredResult = identifyTask.execute(identifyParams);
+
+                    deferredResult.addCallback(function(response) {
+
+                        if (response.length > 1) {
+
+                            var feature;
+                            var attr;
+                            var attrStatus;
+
+                            for (var i = 0; i < response.length; i++) {
+                                if (response[i].layerId == 0) {
+                                    feature = response[i].feature;
+                                    attr = feature.attributes;
+                                } else if (response[i].layerId == 1) {
+                                    attrStatus = response[i].feature.attributes;
+                                }
+
+                            }
+
+                            // Code for adding wetland highlight
+                            var symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
+                                new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
+                                new dojo.Color([255,255,0]), 2), new dojo.Color([98,194,204,0])
+                            );
+                            feature.geometry.spatialReference = map.spatialReference;
+                            var graphic = feature;
+                            graphic.setSymbol(symbol);
+
+                            map.graphics.add(graphic);
+
+                            var projmeta = '';
+                            if (attrStatus.SUPPMAPINFO == 'None') {
+                                projmeta = " NONE";
+                            } else {
+                                projmeta = " <a target='_blank' href='" + attrStatus.SUPPMAPINFO + "'>click here</a>";
+                            }
+
+                            var template = new esri.InfoTemplate("Riparian",
+                                "<b>Classification:</b> " + attr.ATTRIBUTE + " (<a target='_blank' href='https://fwsmapper.wim.usgs.gov/decoders/riparian.aspx?CodeURL=" + attr.ATTRIBUTE + "''>decode</a>)<br/>"+
+                                "<p><b>Wetland Type:</b> " + attr.WETLAND_TYPE + "<br/>" +
+                                "<b>Acres:</b> " + Number(attr.ACRES).toFixed(2) + "<br/>" +
+                                "<b>Image Date(s):</b> " + attrStatus.IMAGE_DATE + "<br/>" +
+                                "<b>Project Metadata:</b>" + projmeta +
+                                "<br/><p><a id='infoWindowLink' href='javascript:void(0)'>Zoom to wetland</a></p>");
+
+                            //ties the above defined InfoTemplate to the feature result returned from a click event
+
+                            feature.setInfoTemplate(template);
+
+                            map.infoWindow.setFeatures([feature]);
+                            map.infoWindow.show(evt.mapPoint);
+
+                            var infoWindowClose = dojo.connect(map.infoWindow, "onHide", function(evt) {
+                                map.graphics.clear();
+                                dojo.disconnect(map.infoWindow, infoWindowClose);
+                            });
+
+                            setCursorByID("mainDiv", "default");
+                            map.setCursor("default");
+
+                            $("#infoWindowLink").click(function(event) {
+                                var convertedGeom = webMercatorUtils.webMercatorToGeographic(feature.geometry);
+
+                                var featExtent = convertedGeom.getExtent();
+
+                                map.setExtent(featExtent, true);
+                            });
+
+                            //map.infoWindow.show(evt.mapPoint);
+
+                        } else if (response.length <= 1) {
+
+                            var historicIdentifyTask = new IdentifyTask(allLayers[2].layers["Historic Wetland Data"].url);
+                            var deferredHistoric = historicIdentifyTask.execute(historicIdentifyParameters);
+
+                            deferredHistoric.addCallback(function(response) {
+
+                                if (response.length >= 1) {
+
+                                    var feature;
+                                    var attr;
+                                    var attrStatus;
+
+                                    for (var i = 0; i < response.length; i++) {
+                                        if (response[i].layerId == 0) {
+                                            feature = response[i].feature;
+                                            attr = feature.attributes;
+                                        } else if (response[i].layerId == 1) {
+                                            attrStatus = response[i].feature.attributes;
+                                        }
+
+                                    }
+
+                                    // Code for adding wetland highlight
+                                    var symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
+                                        new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
+                                            new dojo.Color([255,255,0]), 2), new dojo.Color([98,194,204,0])
+                                    );
+                                    feature.geometry.spatialReference = map.spatialReference;
+                                    var graphic = feature;
+                                    graphic.setSymbol(symbol);
+
+                                    map.graphics.add(graphic);
+
+                                    var projmeta = '';
+                                    if (attrStatus.SUPPMAPINFO == 'None') {
+                                        projmeta = " NONE";
+                                    } else {
+                                        projmeta = " <a target='_blank' href='" + attrStatus.SUPPMAPINFO + "'>click here</a>";
+                                    }
+
+                                    if (attrStatus.IMAGE_DATE == "<Null>" || attrStatus.IMAGE_DATE == "0" || attrStatus.IMAGE_DATE == 0) {
+                                        attrStatus.IMAGE_DATE = projmeta;
+                                    }
+
+                                    var template = new esri.InfoTemplate("Historic Wetland",
+                                        "<p><b>Wetland Type:</b> " + attr.WETLAND_TYPE + "<br/>" +
+                                        "<b>Acres:</b> " + Number(attr.ACRES).toFixed(2) + "<br/>" +
+                                        "<b>Project Metadata:</b>" + projmeta +
+                                        "<br/><p><a id='infoWindowLink' href='javascript:void(0)'>Zoom to wetland</a></p>");
+
+                                    //ties the above defined InfoTemplate to the feature result returned from a click event
+
+                                    feature.setInfoTemplate(template);
+
+                                    map.infoWindow.setFeatures([feature]);
+                                    map.infoWindow.show(evt.mapPoint, map.getInfoWindowAnchor(evt.screenPoint));
+
+                                    var infoWindowClose = dojo.connect(map.infoWindow, "onHide", function(evt) {
+                                        map.graphics.clear();
+                                        dojo.disconnect(map.infoWindow, infoWindowClose);
+                                    });
+
+                                    setCursorByID("mainDiv", "default");
+                                    map.setCursor("default");
+
+                                    $("#infoWindowLink").click(function(event) {
+                                        var convertedGeom = webMercatorUtils.webMercatorToGeographic(feature.geometry);
+
+                                        var featExtent = convertedGeom.getExtent();
+
+                                        map.setExtent(featExtent, true);
+                                    });
+
+                                    //map.infoWindow.show(evt.mapPoint);
+
+                                } else {
+                                    setCursorByID("mainDiv", "default");
+                                    map.setCursor("default");
+                                    map.infoWindow.hide();
+                                }
+                            });
+                        }
+                    });
+                }
             });
-        } 
+        } else if ($("#huc-download-alert")[0].scrollHeight > 0) {
+            //watershed identify task
+            //watershedGraphicsLayer.clear();
+            var identifyParameters = new IdentifyParameters();
+            identifyParameters.returnGeometry = true;
+            identifyParameters.tolerance = 0;
+            identifyParameters.width = map.width;
+            identifyParameters.height = map.height;
+            identifyParameters.geometry = evt.mapPoint;
+            identifyParameters.layerOption = IdentifyParameters.LAYER_OPTION_TOP;
+            identifyParameters.mapExtent = map.extent;
+            identifyParameters.spatialReference = map.spatialReference;
+
+            var identifyTask = new IdentifyTask(allLayers[0].layers["HUC8"].url);
+            var hucDeffered = identifyTask.execute(identifyParameters);
+
+            hucDeffered.addCallback(function(response) {
+                if (response.length >= 1) {
+
+                    var feature;
+                    feature = response[0].feature;
+
+                    // Code for adding HUC highlight
+                    var symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
+                        new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
+                            new dojo.Color([255,255,0]), 2), new dojo.Color([98,194,204,0])
+                    );
+                    feature.geometry.spatialReference = map.spatialReference;
+                    var graphic = feature;
+                    graphic.setSymbol(symbol);
+
+                    map.graphics.add(graphic);
+
+                    var convertedGeom = webMercatorUtils.webMercatorToGeographic(feature.geometry);
+
+                    var featExtent = convertedGeom.getExtent();
+
+                    map.setExtent(featExtent, true);
+
+                    var HUCNumber = response[0].feature.attributes.HUC8;
+                    var HUCName = response[0].feature.attributes.Name;
+                    dojo.byId('innerAlert').innerHTML = "<h4><b>Download Data</b></h4>" +
+                        "<p>Click the link below to download data for " + HUCName + " watershed" +
+                        "<br/><p onclick='hucLinkListener("+HUCNumber+")'><a target='_blank' href='http://www.fws.gov/wetlands/downloads/Watershed/HU8_" + HUCNumber + "_watershed.zip'>HUC " + HUCNumber + "</a></p>";
+                }
+            });
+        }
+    });
+
+    $(document).on("click", "#showHUCs", function() {
+        event.preventDefault();
+        $("#getDataModal").modal("hide");
+        $("#huc-download-alert").slideDown(250);
+        map.getLayer("huc8").setVisibility(true);
+        dojo.byId('innerAlert').innerHTML = "<h4><b>Download Data</b></h4>" +
+        "<p>Please review the Data Download (<a target='_blank' href='https://www.fws.gov/wetlands/Data/Data-Download.html'>www.fws.gov/wetlands/Data/Data-Download.html</a>) page for information on how to download data, what is included in the download and data use limitations and disclaimer.</p>" +
+        "<br/><p><b>Click the map to select a watershed from which to extract wetland data.</b></p>";
+    });
+
+    var geocoder = new Geocoder({
+        value: '',
+        maxLocations: 25,
+        autoComplete: true,
+        arcgisGeocoder: true,
+        autoNavigate: false,
+        map: map
+    }, 'geosearch');
+    geocoder.startup();
+    geocoder.on('select', geocodeSelect);
+    geocoder.on('findResults', geocodeResults);
+    geocoder.on('clear', clearFindGraphics);
+    on(geocoder.inputNode, 'keydown', function (e) {
+        if (e.keyCode == 13) {
+            setSearchExtent();
+        }
     });
 
     // Symbols
-    /*var sym = createPictureSymbol('../images/purple-pin.png', 0, 12, 13, 24);*/
+    var sym = createPictureSymbol('../images/purple-pin.png', 0, 12, 13, 24);
 
     map.on('load', function (){
         map.infoWindow.set('highlight', false);
         map.infoWindow.set('titleInBody', false);
     });
 
-    //create CBRS Unit Search
-    var findCBRS = new FindTask('https://fwspublic.wim.usgs.gov/arcgis/rest/services/CBRAMapper/GeoCBRA/MapServer');
-    var params = new FindParameters();
-    params.layerIds = [4];
-    params.searchFields = ["Unit"];
-    params.outSpatialReference = map.spatialReference;
-    params.returnGeometry = true;
-    console.log("find unit:", params.outSpatialReference);
-
-    function doFind() {
-        params.searchText = dom.byId("searchText").value;
-        findCBRS.execute(params, showResults);
-    }
-
-    function showResults(results){
-        if (results.length > 0){
-            var graphics = [];
-            var graphic = results[0].feature;
-            graphics.push(graphic);
-            var graphicsExtent = graphicsUtils.graphicsExtent(graphics);            
-            map.setExtent(graphicsExtent);
-        }
-        else {
-                $("#invalidSearchModal").modal('show');
-        }
-    }
-
-
-    $("#btnUnitSearch").click(doFind);
-
-    // create search_api widget in element "geosearch"
-
-    
-
-    search_api.create( "geosearch", {
-        on_result: function(o) {
-            // what to do when a location is found
-            // o.result is geojson point feature of location with properties
-            // zoom to location
-            require(["esri/geometry/Extent"], function(Extent) {
-                var noExtents = ["GNIS_MAJOR", "GNIS_MINOR", "ZIPCODE", "AREACODE"];
-                var noExtentCheck = noExtents.indexOf(o.result.properties["Source"])
-                $("#geosearchModal").modal('hide');
-                if (noExtentCheck == -1) {
-                    map.setExtent(
-                        new esri.geometry.Extent({
-                            xmin: o.result.properties.LonMin,
-                            ymin: o.result.properties.LatMin,
-                            xmax: o.result.properties.LonMax,
-                            ymax: o.result.properties.LatMax,
-                            spatialReference: {"wkid":4326}
-                        }),
-                        true
-                    );
-                } else {
-                    //map.setCenter();
-                    require( ["esri/geometry/Point"], function(Point) {
-                        map.centerAndZoom(
-                            new Point( o.result.properties.Lon, o.result.properties.Lat ),
-                            12
-                        );
-                    });
-                }
-            });
-             
-        },
-        "include_usgs_sw": true,
-        "include_usgs_gw": true,
-        "include_usgs_sp": true,
-        "include_usgs_at": true,
-        "include_usgs_ot": true,
-        "include_huc2": true,
-        "include_huc4": true,
-        "include_huc6": true,
-        "include_huc8": true,
-        "include_huc10": true,
-        "include_huc12": true,
-        
-        on_failure: function(o){
-        $("#test").html("Sorry, a location could not be found in search for '"+o.val()+"'");
-           $("#invalidSearchLocationModal").modal('show');
-        }
-    });
-
-
     // Geosearch functions
-    /*on(dom.byId('btnGeosearch'),'click', geosearch);*/
+    on(dom.byId('btnGeosearch'),'click', geosearch);
 
     // Optionally confine search to map extent
-    /*function setSearchExtent (){
-        geocoder.activeGeocoder.searchExtent = null;*/
+    function setSearchExtent (){
+        geocoder.activeGeocoder.searchExtent = null;
         /*if (dom.byId('chkExtent').checked === 1) {
             geocoder.activeGeocoder.searchExtent = map.extent;
         } else {
             geocoder.activeGeocoder.searchExtent = null;
         }*/
-    /*}*/
-    /*function geosearch() {
+    }
+    function geosearch() {
         setSearchExtent();
         var def = geocoder.find();
         def.then(function (res){
@@ -606,16 +796,16 @@ require([
         });
         // Close modal
         $('#geosearchModal').modal('hide');
-    }*/
-    /*function geocodeSelect(item) {
+    }
+    function geocodeSelect(item) {
         clearFindGraphics();
         var g = (item.graphic ? item.graphic : item.result.feature);
         g.setSymbol(sym);
         //addPlaceGraphic(item.result,g.symbol);
         // Close modal
         //$('#geosearchModal').modal('hide');
-    }*/
-    /*function geocodeResults(places) {
+    }
+    function geocodeResults(places) {
         places = places.results;
         if (places.length > 0) {
             clearFindGraphics();
@@ -634,8 +824,8 @@ require([
         } else {
             //alert('Sorry, address or place not found.');  // TODO
         }
-    }*/
-    /*function stripTitle(title) {
+    }
+    function stripTitle(title) {
         var i = title.indexOf(',');
         if (i > 0) {
             title = title.substring(0,i);
@@ -654,22 +844,22 @@ require([
         graphic = new Graphic(pt,symbol,attributes,infoTemplate);
         // Add to map
         map.graphics.add(graphic);
-    }*/
+    }
 
-    /*function zoomToPlaces(places) {
+    function zoomToPlaces(places) {
         var multiPoint = new Multipoint(map.spatialReference);
         for (var i = 0; i < places.length; i++) {
             multiPoint.addPoint(places[i].feature.geometry);
         }
         map.setExtent(multiPoint.getExtent().expand(2.0));
-    }*/
+    }
 
-    /*function clearFindGraphics() {
+    function clearFindGraphics() {
         map.infoWindow.hide();
         map.graphics.clear();
-    }*/
+    }
 
-    /*function createPictureSymbol(url, xOffset, yOffset, xWidth, yHeight) {
+    function createPictureSymbol(url, xOffset, yOffset, xWidth, yHeight) {
         return new PictureMarkerSymbol(
             {
                 'angle': 0,
@@ -678,7 +868,73 @@ require([
                 'contentType': 'image/png',
                 'width':xWidth, 'height': yHeight
             });
-    }*/
+    }
+
+    function printMap() {
+
+        var printParams = new PrintParameters();
+        printParams.map = map;
+
+        var template = new PrintTemplate();
+        template.exportOptions = {
+            width: 500,
+            height: 400,
+            dpi: 300
+        };
+        template.format = "PDF";
+        template.layout = "Letter ANSI A Landscape test";
+        template.preserveScale = false;
+        var wetlandsLegendLayer = new LegendLayer();
+        wetlandsLegendLayer.layerId = "wetlands";
+        var wetlandsRasterLegendLayer = new LegendLayer();
+        wetlandsRasterLegendLayer.layerId = "wetlandsRaster"
+        //legendLayer.subLayerIds = [*];
+
+        var userTitle = $("#printTitle").val();
+        //if user does not provide title, use default. otherwise apply user title
+        if (userTitle == "") {
+            template.layoutOptions = {
+                "titleText": "Wetlands",
+                "authorText" : "National Wetlands Inventory (NWI)",
+                "copyrightText": "This page was produced by the NWI mapper",
+                "legendLayers": [wetlandsLegendLayer,wetlandsRasterLegendLayer]
+            };
+        } else {
+            template.layoutOptions = {
+                "titleText": userTitle,
+                "authorText" : "National Wetlands Inventory (NWI)",
+                "copyrightText": "This page was produced by the NWI mapper",
+                "legendLayers": [wetlandsLegendLayer,wetlandsRasterLegendLayer]
+            };
+        }
+
+        //"legendLayers": [legendLayer]
+        var docTitle = template.layoutOptions.titleText;
+        printParams.template = template;
+        var printMap = new PrintTask("https://fwsmapper.wim.usgs.gov/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task");
+        printMap.execute(printParams, printDone, printError);
+
+        $.get("https://fwsmapper.wim.usgs.gov/pdfLoggingService/pdfLog.asmx/Log?printInfo=" + map.getScale() + "," + map.extent.xmin + "," + map.extent.ymax + "," + map.extent.xmax + "," + map.extent.ymin + ",NWIV2", function(data) {
+           //console.log(data);
+        });
+
+        function printDone(event) {
+            //alert(event.url);
+            //window.open(event.url, "_blank");
+            printCount++;
+            //var printJob = $('<a href="'+ event.url +'" target="_blank">Printout ' + printCount + ' </a>');
+            var printJob = $('<p><label>' + printCount + ': </label>&nbsp;&nbsp;<a href="'+ event.url +'" target="_blank">' + docTitle +' </a></p>');
+            //$("#print-form").append(printJob);
+            $("#printJobsDiv").find("p.toRemove").remove();
+            $("#printModalBody").append(printJob);
+            $("#printTitle").val("");
+            $("#printExecuteButton").button('reset');
+        }
+
+        function printError(event) {
+            alert("Sorry, an unclear print error occurred. Please try refreshing the application to fix the problem");
+        }
+    }
 
     function setCursorByID(id,cursorStyle) {
         var elem;
@@ -697,16 +953,9 @@ require([
         $('#geosearchNav').click(function(){
             showModal();
         });
-        
-        $('.showAboutModal').click(function(){
-            $('#contactTob').modal('hide');
-            $('#aboutModal').modal('show');
-            $('#aboutTab').trigger('click');
-        });
 
         function showAboutModal () {
             $('#aboutModal').modal('show');
-            $('')
         }
         $('#aboutNav').click(function(){
             showAboutModal();
@@ -720,9 +969,10 @@ require([
 
         maxLegendHeight =  ($('#mapDiv').height()) * 0.90;
         $('#legendElement').css('max-height', maxLegendHeight);
+        maxLegendDivHeight = (maxLegendHeight) - parseInt($('#legendHeading').css("height").replace('px',''));
         $('#legendDiv').css('max-height', maxLegendDivHeight);
 
-/*        $('#legendCollapse').on('shown.bs.collapse', function () {
+        $('#legendCollapse').on('shown.bs.collapse', function () {
             if (legendDiv.innerHTML.length == 0 ) {
                 var legend = new Legend({
                     map: map,
@@ -731,8 +981,15 @@ require([
                 legend.startup();
 
                 $("#legendDiv").niceScroll();
+
+                /*legend.addCallback(function(response) { 
+                    maxLegendHeight =  ($('#mapDiv').height()) * 0.90;
+                    $('#legendElement').css('max-height', maxLegendHeight);
+                    maxLegendDivHeight = ($('#legendElement').height()) - parseInt($('#legendHeading').css("height").replace('px',''));
+                    $('#legendDiv').css('max-height', maxLegendDivHeight);
+                });*/
             }
-        });*/
+        });
 
         $('#legendCollapse').on('hide.bs.collapse', function () {
             $('#legendElement').css('height', 'initial');
@@ -751,30 +1008,6 @@ require([
 
     });
 
-    $(document).ready(function(){
-        function showModal() {
-        $('#cbrsModal').modal('show');
-        }
-
-        $('#cbrsNav').click(function(){
-            showModal();
-        });
-    });
-    
-     // invalid CBRS search modal
-    $(document).ready(function(){
-        function showModal() {
-            $('#invalidSearchModal').modal('show');
-        }
-    });
-
-    $(document).ready(function(){
-        function showModal() {
-            $('#invalidSearchLocationModal').modal('show');
-        }
-    });
-
-        
     require([
         'esri/InfoTemplate',
         'esri/tasks/locator',
@@ -848,6 +1081,30 @@ require([
                     exclusiveGroupName = layerDetails.wimOptions.exclusiveGroupName;
                 }
 
+                if (layerDetails.wimOptions.layerType === 'agisFeature') {
+                    var layer = new FeatureLayer(layerDetails.url, layerDetails.options);
+                    if (layerDetails.wimOptions.renderer !== undefined) {
+                        layer.setRenderer(layerDetails.wimOptions.renderer);
+                    }
+                    //check if include in legend is true
+                    if (layerDetails.wimOptions && layerDetails.wimOptions.includeLegend == true){
+                        legendLayers.unshift({layer:layer, title: layerName});
+                    }
+                    addLayer(group.groupHeading, group.showGroupHeading, layer, layerName, exclusiveGroupName, layerDetails.options, layerDetails.wimOptions);
+                    //addMapServerLegend(layerName, layerDetails);
+                }
+
+                else if (layerDetails.wimOptions.layerType === 'agisWMS') {
+                    var layer = new WMSLayer(layerDetails.url, {resourceInfo: layerDetails.options.resourceInfo, visibleLayers: layerDetails.options.visibleLayers }, layerDetails.options);
+                    //check if include in legend is true
+                    if (layerDetails.wimOptions && layerDetails.wimOptions.includeLegend == true){
+                        legendLayers.unshift({layer:layer, title: layerName});
+                    }
+                    //map.addLayer(layer);
+                    addLayer(group.groupHeading, group.showGroupHeading, layer, layerName, exclusiveGroupName, layerDetails.options, layerDetails.wimOptions);
+                    //addMapServerLegend(layerName, layerDetails);
+                }
+
                 else if (layerDetails.wimOptions.layerType === 'agisDynamic') {
                     var layer = new ArcGISDynamicMapServiceLayer(layerDetails.url, layerDetails.options);
                     //check if include in legend is true
@@ -869,6 +1126,19 @@ require([
                     //addMapServerLegend(layerName, layerDetails);
                 }
 
+                else if (layerDetails.wimOptions.layerType === 'agisImage') {
+                    var layer = new ArcGISImageServiceLayer(layerDetails.url, layerDetails.options);
+                    //check if include in legend is true
+                    if (layerDetails.wimOptions && layerDetails.wimOptions.includeLegend == true){
+                        legendLayers.unshift({layer:layer, title: layerName});
+                    }
+                    if (layerDetails.visibleLayers) {
+                        layer.setVisibleLayers(layerDetails.visibleLayers);
+                    }
+                    //map.addLayer(layer);
+                    addLayer(group.groupHeading, group.showGroupHeading, layer, layerName, exclusiveGroupName, layerDetails.options, layerDetails.wimOptions);
+                    //addMapServerLegend(layerName, layerDetails);
+                }
             });
         });
 
@@ -878,10 +1148,10 @@ require([
             //layer.addTo(map);
             map.addLayer(layer);
 
-            /*if (layer.ids == 'cbrs') {
+            if (layer.id == 'aoi') {
                 on(layer, 'load', function(evt) {
                     on(layer, 'click', function (evt) {
-                        cbrsClicked = true;
+                        aoiClicked = true;
                         var linkValue = evt.graphic.attributes.HYPERLINK_2;
                         if (linkValue == "None") {
                             var template = new InfoTemplate("${NAME}",
@@ -903,7 +1173,7 @@ require([
                         }
                     });
                 });
-            }*/
+            }
 
             //add layer to layer list
             mapLayers.push([exclusiveGroupName,camelize(layerName),layer]);
@@ -999,17 +1269,17 @@ require([
 
                 //create layer toggle
                 //var button = $('<div align="left" style="cursor: pointer;padding:5px;"><span class="glyphspan glyphicon glyphicon-check"></span>&nbsp;&nbsp;' + layerName + '</div>');
-                if ((layer.visible && wimOptions.hasOpacitySlider)) {
-                    var button = $('<div class="btn-group-vertical lyrTog" style="cursor: pointer;" data-toggle="buttons"> <button type="button" class="btn btn-default" aria-pressed="true" style="font-weight: bold;text-align: left"><i class="glyphspan fa fa-check-square-o"></i>&nbsp;&nbsp;' + layerName + '<span id="opacity' + camelize(layerName) + '" style="padding-right: 5px" class="glyphspan glyphicon glyphicon-adjust pull-right"></span></button></div>');
-                } else if ((!layer.visible && wimOptions.hasOpacitySlider)) {
+                if ((layer.visible && wimOptions.hasOpacitySlider !== undefined && wimOptions.hasOpacitySlider == true && wimOptions.moreinfo !== undefined && wimOptions.moreinfo)) {
+                    var button = $('<div class="btn-group-vertical lyrTog" style="cursor: pointer;" data-toggle="buttons"> <button type="button" class="btn btn-default" aria-pressed="true" style="font-weight: bold;text-align: left"><i class="glyphspan fa fa-check-square-o"></i>&nbsp;&nbsp;' + layerName + '<span id="info' + camelize(layerName) + '" title="more info" class="glyphspan glyphicon glyphicon-question-sign pull-right"></span><span id="opacity' + camelize(layerName) + '" style="padding-right: 5px" class="glyphspan glyphicon glyphicon-adjust pull-right"></span></button></div>');
+                } else if ((!layer.visible && wimOptions.hasOpacitySlider !== undefined && wimOptions.hasOpacitySlider == true && wimOptions.moreinfo !== undefined && wimOptions.moreinfo)) {
                     var button = $('<div class="btn-group-vertical lyrTog" style="cursor: pointer;" data-toggle="buttons"> <button type="button" class="btn btn-default" aria-pressed="true" style="font-weight: bold;text-align: left"><i class="glyphspan fa fa-square-o"></i>&nbsp;&nbsp;' + layerName + '<span id="info' + camelize(layerName) + '" title="more info" class="glyphspan glyphicon glyphicon-question-sign pull-right"></span><span id="opacity' + camelize(layerName) + '" style="padding-right: 5px" class="glyphspan glyphicon glyphicon-adjust pull-right"></span></button></div>');
                 } else if (layer.visible && wimOptions.hasOpacitySlider !== undefined && wimOptions.hasOpacitySlider == true) {
                     var button = $('<div class="btn-group-vertical lyrTog" style="cursor: pointer;" data-toggle="buttons"> <button type="button" class="btn btn-default" aria-pressed="true" style="font-weight: bold;text-align: left"><i class="glyphspan fa fa-check-square-o"></i>&nbsp;&nbsp;' + layerName + '<span id="info' + camelize(layerName) + '" title="more info" class="glyphspan glyphicon glyphicon-question-sign pull-right"></button></span></div>');
                 } else if ((!layer.visible && wimOptions.hasOpacitySlider !== undefined && wimOptions.hasOpacitySlider == true)) {
-                    var button = $('<div class="btn-group-vertical lyrTog" style="cursor: pointer;" data-toggle="buttons"> <button type="button" class="btn btn-default active" aria-pressed="true" style="font-weight: bold;text-align: left"><i class="glyphspan fa fa-square-o"></i>&nbsp;&nbsp;' + layerName + '<span id="info' + camelize(layerName) + '" title="more info" class="glyphspan glyphicon glyphicon-question-sign pull-right"></span>' + '<span id="opacity' + camelize(layerName) + '" class="glyphspan glyphicon glyphicon-adjust pull-right"></button></span></div>');
-                } else if ((layer.visible)) {
-                    var button = $('<div class="btn-group-vertical lyrTog" style="cursor: pointer;" data-toggle="buttons"> <button type="button" class="btn btn-default" aria-pressed="true" style="font-weight: bold;text-align: left"><i class="glyphspan fa fa-check-square-o"></i>&nbsp;&nbsp;' + layerName + '<span id="info' + camelize(layerName) + '" title="more info" class="glyphspan glyphicon glyphicon-question-sign pull-right"></span>' + '<span id="opacity' + camelize(layerName) + '" class="glyphspan glyphicon glyphicon-adjust pull-right"></button></span></div>');
-                } else if ((!layer.visible)) {
+                    var button = $('<div class="btn-group-vertical lyrTog" style="cursor: pointer;" data-toggle="buttons"> <button type="button" class="btn btn-default active" aria-pressed="true" style="font-weight: bold;text-align: left"><i class="glyphspan fa fa-square-o"></i>&nbsp;&nbsp;' + layerName + '<span id="opacity' + camelize(layerName) + '" class="glyphspan glyphicon glyphicon-adjust pull-right"></button></span></div>');
+                } else if ((layer.visible && wimOptions.moreinfo !== undefined && wimOptions.moreinfo)) {
+                    var button = $('<div class="btn-group-vertical lyrTog" style="cursor: pointer;" data-toggle="buttons"> <button type="button" class="btn btn-default" aria-pressed="true" style="font-weight: bold;text-align: left"><i class="glyphspan fa fa-check-square-o"></i>&nbsp;&nbsp;' + layerName + '<span id="opacity' + camelize(layerName) + '" class="glyphspan glyphicon glyphicon-adjust pull-right"></button></span></div>');
+                } else if ((!layer.visible && wimOptions.moreinfo !== undefined && wimOptions.moreinfo)) {
                     var button = $('<div class="btn-group-vertical lyrTog" style="cursor: pointer;" data-toggle="buttons"> <button type="button" class="btn btn-default" aria-pressed="true" style="font-weight: bold;text-align: left"><i class="glyphspan fa fa-square-o"></i>&nbsp;&nbsp;' + layerName + '<span id="info' + camelize(layerName) + '" title="more info" class="glyphspan glyphicon glyphicon-question-sign pull-right"></button></span></div>');
                 } else if (layer.visible) {
                     var button = $('<div class="btn-group-vertical lyrTog" style="cursor: pointer;" data-toggle="buttons"> <button type="button" class="btn btn-default active" aria-pressed="true" style="font-weight: bold;text-align: left"><i class="glyphspan fa fa-check-square-o"></i>&nbsp;&nbsp;' + layerName + '</button></span></div>');
@@ -1365,18 +1635,3 @@ $(document).ready(function () {
     //});
 
 });
-
-
-// tool tip for Unit Type on Popup
-$(function () {
-  $('[data-toggle="tooltip"]').tooltip({
-      'selector': '',
-      'placement': 'top',
-      'container': 'body'
-  });
-});
-
-// adding helpful message to Measure button
-function message() {
-    document.getElementById("helpfulHint").innerHTML = "<hr>Click the tool again to deselect it and return to normal map controls";
-}

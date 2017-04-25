@@ -122,20 +122,6 @@ body {
     background-color: rgba(255,255,255,0.8);
 }
 
-.esriLegendLayerLabel { 
-    font-weight: bold;
-}
-
-/*hiding layer name; still shows layer with zoom*/
-
-.esriLegendServiceLabel {
-    visibility: hidden;
-}
-
-.esriLegendLayer{
-    margin-bottom: 20px;
-}
-
 #homeButton {
     position: absolute;
     top: 75px;
@@ -196,7 +182,7 @@ body {
 }
 
 #legendCollapse {
-    max-height: inherit;
+    /*max-height: inherit;*/
 }
 
 /*#legendElement {*/
@@ -229,16 +215,12 @@ body {
 }
 
 .legendHeading {
-    color: #6F758E;
-    text-decoration: none!important;
-    font-size: 10pt;
-    text-align: center;
-    text-transform: uppercase;
+    color: black;
     background-color: rgb(255,255,255);
     background-color: rgba(255,255,255,0.8);
     text-decoration: none !important;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
     padding-right: 10px;
     padding-left: 10px;
 }
@@ -405,6 +387,13 @@ body {
     width:inherit;
 }
 
+#fwsLogo {
+    height: auto;
+    width: auto;
+    max-width: 40px;
+    max-height: 40px;
+}
+
 .no-col-padding {
     padding: 0;
 }
@@ -462,169 +451,10 @@ input[type="checkbox"], input[type="radio"] {
     background-position: -51px 53%;
 }
 
-/* PopUp CSS*/
-
-.selectionToolsClass {
-    position:absolute;
-    top:100px;
-    left:100px;
-    width:650px;
-    height:450px;
-    z-index:3;
-    color: black;
-    background-color: rgb(255,255,255);
-    background-color: rgba(255,255,255,0.8);
-    box-shadow: 0 1px 5px rgba(0,0,0,0.65);
-    /*min-width: 150px;*/
-    border-radius: 4px;
-    visibility: hidden;
-}
-
-.siteInfoClass {
-    position:absolute;
-    width:450px;
-    height:200px;
-    z-index:2;
-    color: black;
-    background-color: rgb(255,255,255);
-    background-color: rgba(255,255,255,0.8);
-    box-shadow: 0 1px 5px rgba(0,0,0,0.65);
-    /*min-width: 150px;*/
-    border-radius: 4px;
-    visibility: hidden;
-}
-
-.bufferInfoClass {
-    position:absolute;
-    width:500px;
-    height:400px;
-    z-index:2;
-    color: black;
-    background-color: rgb(255,255,255);
-    background-color: rgba(255,255,255,0.8);
-    box-shadow: 0 1px 5px rgba(0,0,0,0.65);
-    /*min-width: 150px;*/
-    border-radius: 4px;
-    visibility: hidden;
-}
-
-.fwslogo {
-    float: left;
-    margin-right: 10px;
-}
-
-#selectionMin {
-    cursor: pointer;
-    display: inline;
-    padding-right: 15px;
-    font-size: 20px;
-    font-weight: bold;
-}
-
-#selectionClose {
-    cursor: pointer;
-    display: inline;
-    padding-top: 3px;
-    padding-right: 6px;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-#bufferClose {
-    cursor: pointer;
-    display: inline;
-    padding-top: 3px;
-    padding-right: 6px;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.layerHelp {
-    font-size: 8.5pt;
-}
-
-.cbrsSearch {
-    width: 100%;
-    height: 100%;
-    border: none;
-    outline: none;
-    color: #333;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 14px; /* varies with size class */
-    padding-left: 10px;
-}
-
-#cbrsContainer {
-    width: 300px;
-    height: 34px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: #fff;
-}
-
-#searchIcon{
-    width: 34px; /* varies with size class */
-    height: 100%;
-    border: none;
-    border-right: 1px solid #ccc;
-    border-radius: 4px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    background-color: #eee;
-    text-align: center;
-}
-
-.searchBtn{
-    width: 34px;
-    border: none;
-    border-right:1px solid #ccc;
-    border-radius: 4px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-    background-color: #eee;
-    text-align: center;
-}
-
-.inputCbrs{
-    border: 1px solid;
-    padding-top: 8px;
-    border-radius: 4px;
-    width: 200px;
-    height: 20px;
-}
-
-.esriLegendLayerLabel{
-    display: none;
-}
-
-.esriLegendServiceLabel{
-    display: none;
-}
-
-.cbrsLegendTitle {
-    position: inherit;
-    padding-top: 10px;
-    padding-left: 10px;
-    font-weight: bold;
-}
-
-#legendElement #legendDiv {
-  background-color: transparent;
-}
-
-div.tooltip-inner {
-    max-width: 350px;
-    max-height: 350px;
-}
-
-.tooltip > .tooltip-inner {
-    background-color: #ffffff;
-    color: #000;
-}
-.tooltip > .tooltip-arrow { 
-    border-bottom-color:#ffffff;
-}
-
 .map .logo-med{
+    display: none;
+}
+
+#legendElement{
     display: none;
 }

@@ -29,80 +29,31 @@ require([
 
     allLayers = [
         {
-            'groupHeading': 'Ecoregions of North America',
-            'showGroupHeading': true,
+            'groupHeading': 'ESRI dynamic map services',
+            'showGroupHeading': false,
             'includeInLayerList': true,
             'layers': {
-                'Level 1' : {
-                    'url': 'https://maps4.arcgisonline.com/ArcGIS/rest/services/DOI/EPA_Ecoregions_of_North_America/MapServer',
-                    'visibleLayers': [1],
+                'USGS Regions' : {
+                    'url': 'https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/USGS_Regions/FeatureServer/0?token=DjcX42N0ihSH--P-qYw5815P-YVYlkUM34RJhmOFAP6zuBPMZgYcr5vgDrpbXHUO7xgoIQtxY1upVC5Ro_PSxQj0hOJ_cVaLL1PDiY6GL9neK1F4Zt32o59F4JtVfnz2fAW8UjnX2cf1-nQiNj01agF_zDKFtF6M8xPmIFSZwoaY9O0RAvsWapQ_UwpzTXAN3ZRKGg-nM-tCaqiajg99JyrHABeY18mcw_BOFKTdWnczoYSWaoPigYJz_PU-XhPI',
                     'options': {
-                        'id': 'levOne',
-                        'opacity': 0.75,
-                        'visible': true
-                    },
-                    'wimOptions': {
-                        'type': 'layer',
-                        'layerType': 'agisDynamic',
-                        'includeInLayerList': true,
-                        'zoomScale': 144448,
-                        'hasOpacitySlider': true,
-                        'includeLegend' : true
-                    }
-                },
-                'Level 2' : {
-                    'url': 'https://maps4.arcgisonline.com/ArcGIS/rest/services/DOI/EPA_Ecoregions_of_North_America/MapServer/',
-                    'visibleLayers': [2],
-                    'options': {
-                        'id': 'levTwo',
-                        'opacity': 0.75,
-                        'visible': true
-                    },
-                    'wimOptions': {
-                        'type': 'layer',
-                        'layerType': 'agisDynamic',
-                        'includeInLayerList': true,
-                        'zoomScale': 144448,
-                        'hasOpacitySlider': true,
-                        'includeLegend' : false
-                    }
-                },
-                'Level 3' : {
-                    'url': 'https://maps4.arcgisonline.com/ArcGIS/rest/services/DOI/EPA_Ecoregions_of_North_America/MapServer/',
-                    'visibleLayers': [3],
-                    'options': {
-                        'id': 'levThree',
-                        'opacity': 0.75,
-                        'visible': true
-                    },
-                    'wimOptions': {
-                        'type': 'layer',
-                        'layerType': 'agisDynamic',
-                        'includeInLayerList': true,
-                        'zoomScale': 144448,
-                        'hasOpacitySlider': true,
-                        'includeLegend' : true
-                    }
-                },
-                'ecoregions' : {
-                    'url': 'https://maps4.arcgisonline.com/ArcGIS/rest/services/DOI/EPA_Ecoregions_of_North_America/MapServer/',
-                    'visibleLayers': [0],
-                    'options': {
-                        'id': 'ecoregions',
+                        'id': 'usgsRegions',
                         'opacity': 0.75,
                         'visible': false
                     },
                     'wimOptions': {
                         'type': 'layer',
-                        'layerType': 'agisDynamic',
-                        'includeInLayerList': false,
+                        'layerType': 'agisFeature',
+                        'includeInLayerList': true,
                         'zoomScale': 144448,
                         'hasOpacitySlider': true,
-                        'includeLegend' : false
+                        'includeLegend' : true,
+                        'moreinfo': 'https://services1.arcgis.com/Hp6G80Pky0om7QvQ/ArcGIS/rest/services/USGS_Regions/FeatureServer?token=DjcX42N0ihSH--P-qYw5815P-YVYlkUM34RJhmOFAP6zuBPMZgYcr5vgDrpbXHUO7xgoIQtxY1upVC5Ro_PSxQj0hOJ_cVaLL1PDiY6GL9neK1F4Zt32o59F4JtVfnz2fAW8UjnX2cf1-nQiNj01agF_zDKFtF6M8xPmIFSZwoaY9O0RAvsWapQ_UwpzTXAN3ZRKGg-nM-tCaqiajg99JyrHABeY18mcw_BOFKTdWnczoYSWaoPigYJz_PU-XhPI',
+                        'otherLayersToggled': ['wetlandsStatus', 'wetlandsRaster']
                     }
-                }
+                },
             }
-        }
+        },
+        
     ];
  
 });

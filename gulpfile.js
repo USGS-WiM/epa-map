@@ -22,7 +22,7 @@ var $ = require('gulp-load-plugins')();
 
 // Styles
 gulp.task('styles', function () {
-    return gulp.src(['src/styles/main.css','src/bower_components/wim-styles/template/css/base.css',`src/bower_components/jquery-ui/themes/black-tie/jquery-ui.css`,'src/bower_components/lobipanel/css/lobipanel.css'])
+    return gulp.src(['src/styles/main.css','src/bower_components/wim-styles/template/css/base.css'])
         .pipe($.autoprefixer('last 1 version'))
         .pipe(gulp.dest('src/styles'))
         .pipe($.size());
