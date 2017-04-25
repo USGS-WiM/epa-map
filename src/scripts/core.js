@@ -35,6 +35,8 @@ require([
     'esri/layers/ArcGISTiledMapServiceLayer',
     'esri/renderers/UniqueValueRenderer',
     'esri/SpatialReference',
+    'esri/tasks/query', 
+    'esri/tasks/QueryTask',
     'esri/symbols/PictureMarkerSymbol',
     'esri/tasks/GeometryService',
     'esri/tasks/IdentifyParameters',
@@ -68,6 +70,8 @@ require([
     ArcGISTiledMapServiceLayer,
     UniqueValueRenderer,
     SpatialReference,
+    Query,
+    QueryTask,
     PictureMarkerSymbol,
     GeometryService,
     IdentifyParameters,
@@ -144,6 +148,93 @@ require([
         scale: 4514,
     }, "locateButton");
     locate.startup();
+
+  on(locate, "locate", function(evt) {
+      
+        console.log("location returned:" + evt.position.coords.latitude);
+        console.log("location returned:" + evt.position.coords.longitude);
+
+        queryTask = new esri.tasks.QueryTask("https://services1.arcgis.com/Hp6G80Pky0om7QvQ/ArcGIS/rest/services/USGS_Regions/FeatureServer/0?token=DjcX42N0ihSH--P-qYw5815P-YVYlkUM34RJhmOFAP6zuBPMZgYcr5vgDrpbXHUO7xgoIQtxY1upVC5Ro_PSxQj0hOJ_cVaLL1PDiY6GL9neK1F4Zt32o59F4JtVfnz2fAW8UjnX2cf1-nQiNj01agF_zDKFtF6M8xPmIFSZwoaY9O0RAvsWapQ_UwpzTXAN3ZRKGg-nM-tCaqiajg99JyrHABeY18mcw_BOFKTdWnczoYSWaoPigYJz_PU-XhPI");
+
+        query = new esri.tasks.Query();
+        query.returnGeometry = true;
+        query.outFields = ["Region", "Headqrtrs"];
+        
+        infoTemplate = new esri.InfoTemplate("USGS Region", "Region: ${Region}<br />Headquarters: ${Headqrtrs}");
+
+        query.geometry = evt.graphic.geometry;
+        queryTask.execute(query, showResults);
+    
+    
+
+      function showResults(featureSet) {
+        //remove all graphics on the maps graphics layer
+        map.graphics.clear();
+
+        //QueryTask returns a featureSet.  Loop through features in the featureSet and add them to the map.
+
+        if (featureSet.features.length > 0) {
+          
+         var feature = featureSet.features[0];
+
+          feature.setInfoTemplate(infoTemplate);
+          map.infoWindow.setFeatures([feature]);
+          map.infoWindow.show(new Point(evt.position.coords.longitude, evt.position.coords.latitude, new SpatialReference({ wkid: 4326 })));
+
+          //Set the infoTemplate.
+          /*graphic.setInfoTemplate(infoTemplate);*/
+
+          //Add graphic to the map graphics layer.
+          /*map.graphics.add(graphic);*/
+        
+        }
+      }
+
+        /*function showResults (results) {
+          var resultItems = [];
+          var resultCount = results.features.length;
+          for (var i = 0; i < resultCount; i++) {
+            var featureAttributes = results.features[i].attributes;
+            for (var attr in featureAttributes) {
+              resultItems.push("<b>" + attr + ":</b>  " + featureAttributes[attr] + "<br>");
+            }
+            resultItems.push("<br>");
+          }
+        }*/
+
+       /* feature.geometry.spatialReference = map.spatialReference;
+        var graphic = feature;
+        graphic.setSymbol(symbol);
+
+        map.graphics.add(graphic);*/
+
+        /*var feature;
+        var attr;
+        attr = feature.attributes;*/
+
+       /* var template = new esri.InfoTemplate("USGS Regions",
+            "<b>Region:</b> " + attr.Region + "<br/>" +
+            "<p><b>Headquarters:</b> " + attr.Headqrtrs + "<br/>" +
+            "<br/><p><a id='infoWindowLink' href='javascript:void(0)'>Zoom to wetland</a></p>");
+
+            feature.setInfoTemplate(template);
+
+            map.infoWindow.setFeatures([feature]);
+            map.infoWindow.show(evt.mapPoint, map.getInfoWindowAnchor(evt.screenPoint));
+
+            var infoWindowClose = dojo.connect(map.infoWindow, "onHide", function(evt) {
+                map.graphics.clear();
+                dojo.disconnect(map.infoWindow, infoWindowClose);
+            });
+
+            $("#infoWindowLink").click(function(event) {
+            var convertedGeom = webMercatorUtils.webMercatorToGeographic(feature.geometry);
+
+            var featExtent = convertedGeom.getExtent();
+
+            map.setExtent(featExtent, true);
+        });*/
+    });
 
     measurement = new Measurement({
         map: map,
@@ -290,7 +381,7 @@ require([
     identifyParams.width  = map.width;
     identifyParams.height = map.height;
     //identifyTask = new esri.tasks.IdentifyTask("http://50.17.205.92/arcgis/rest/services/NAWQA/DecadalMap/MapServer");
-    identifyTask = new IdentifyTask(allLayers[0].layers["Revised Polygons"].url);
+    identifyTask = new IdentifyTask(allLayers[0].layers["USGS Regions"].url);
 
     //code for adding draggability to infoWindow. http://www.gavinr.com/2015/04/13/arcgis-javascript-draggable-infowindow/
     var handle = query(".title", map.infoWindow.domNode)[0];
@@ -329,24 +420,12 @@ require([
         identifyParams.geometry = evt.mapPoint;
         identifyParams.mapExtent = map.extent;
 
-        if (map.getLevel() >= 12 && $("#huc-download-alert")[0].scrollHeight == 0) {
+        if (map.getLevel()) {
             //the deferred variable is set to the parameters defined above and will be used later to build the contents of the infoWindow.
-            identifyTask = new IdentifyTask(allLayers[0].layers["Wetlands"].url);
+            identifyTask = new IdentifyTask(allLayers[0].layers["USGS Regions"].url);
             var deferredResult = identifyTask.execute(identifyParams);
 
-            //Historic Wetland Identify task
-            var historicIdentifyParameters = new IdentifyParameters();
-            historicIdentifyParameters.returnGeometry = true;
-            historicIdentifyParameters.tolerance = 0;
-            historicIdentifyParameters.width = map.width;
-            historicIdentifyParameters.height = map.height;
-            historicIdentifyParameters.geometry = evt.mapPoint;
-            historicIdentifyParameters.layerOption = IdentifyParameters.LAYER_OPTION_ALL;
-            historicIdentifyParameters.mapExtent = map.extent;
-            historicIdentifyParameters.layerIds = [0,1];
-
             setCursorByID("mainDiv", "wait");
-            map.setCursor("wait");
 
             deferredResult.addCallback(function(response) {
 
@@ -357,20 +436,50 @@ require([
                     var attrStatus;
 
                     for (var i = 0; i < response.length; i++) {
+                        feature = response[i].feature;
+
+                        //getting feature attributes
+                        attr = feature.attributes;
+                        
+                        var symbol;
                         if (response[i].layerId == 0) {
-                            feature = response[i].feature;
-                            attr = feature.attributes;
-                        } else if (response[i].layerId == 1) {
-                            attrStatus = response[i].feature.attributes;
+                            $("#mapLink").html('<a href="' + attr["Map_Link"] + '" target="_blank">Click Here</a>');
+                            $("#mapDate").text(attr["Map_Date"]);
+                            $("#titleOne").text(attr["Title"]);
+                            $("#titleTwo").text(attr["Title_2"]);
+                            $("#titleThree").text(attr["Title_3"]);
+                            symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
+                                new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
+                                    new dojo.Color([255,0,225]), 2), new dojo.Color([98,194,204,0])
+                            );
+                        } if (response[i].layerId == 4) {
+                            $("#unitId").text(attr["Unit"]);
+                            $("#unitName").text(attr["Name"]);
+                            $("#unitType").text(attr["Unit_Type"]);
+                            $("#dataTier").text(attr["Tier"]);
+
+                           if (attr["Tier"] == '2') {
+                                var totalAcre;
+                                totalAcre = Number(attr["Fast_Acres"]) + Number(attr["Wet_Acres"]);
+                            } else {
+                                totalAcre = "Data not available at this time";
+                            };
+                            
+                            $('#totalAcre').text(totalAcre);
+            
+                            symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
+                                new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
+                                    new dojo.Color([255,225,0]), 2), new dojo.Color([98,194,204,0])
+                            );
+
+                            
+                            
+                            /*if (attr.Tier == 2){
+                                attr.totalAcreage = "Approximately" + (Number(attr.Fast_Acres + attr.Wet_Acres)) + "acres.";
+                            }*/
+                           
                         }
-
                     }
-
-                    // Code for adding wetland highlight
-                    var symbol = new esri.symbol.SimpleFillSymbol(esri.symbol.SimpleFillSymbol.STYLE_SOLID,
-                        new esri.symbol.SimpleLineSymbol(esri.symbol.SimpleLineSymbol.STYLE_SOLID,
-                        new dojo.Color([255,255,0]), 2), new dojo.Color([98,194,204,0])
-                    );
                     feature.geometry.spatialReference = map.spatialReference;
                     var graphic = feature;
                     graphic.setSymbol(symbol);

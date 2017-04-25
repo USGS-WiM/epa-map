@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>CBRS Projects</title>
+        <title>USGS Regions POC</title>
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
         <!-- build:css styles/vendor.css -->
         <!-- bower:css -->
         <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="bower_components/jquery-ui/themes/black-tie/jquery-ui.css"/>
         <link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.min.css">
         <link rel="stylesheet" href="bower_components/bootstrap-map-js/src/css/bootstrapmap.css" />
         <link rel="stylesheet" href="bower_components/bootstrap-sidebar/dist/css/sidebar.css" />
+        <link rel="stylesheet" href="bower_components/lobipanel/css/lobipanel.css" />
         <!-- endbower -->
         <!-- endbuild -->
         <!-- CSS for the mapping components -->
         <link rel="stylesheet" href="https://js.arcgis.com/3.14/dijit/themes/claro/claro.css">
         <link rel="stylesheet" href="https://js.arcgis.com/3.14/esri/css/esri.css">
+
+        <link rel="stylesheet" href="https://txpub.usgs.gov/DSS/search_api/2.0/api/search_api.css"/>
 
         <!-- build:css styles/main.css -->
         <link rel="stylesheet" href="styles/main.css">
@@ -24,20 +28,23 @@
         <!--<link rel="stylesheet" href="bower_components/wim-styles/core/css/wim.css">-->
         <link rel="stylesheet" href="bower_components/wim-styles/template/css/base.css">
         <!--endbuild -->
-        <link rel="shortcut icon" href="/favicon.ico">
+        <link rel="shortcut icon" id="favicon" type="image/png" href="images/favicon-dark.png" />
 
         <!-- build:js scripts/vendor.js -->
         <!-- bower:js -->
         <script src="bower_components/jquery/dist/jquery.js"></script>
         <script src="bower_components/jquery.nicescroll/dist/jquery.nicescroll.min.js"></script>
+        <script src="bower_components/lobipanel/js/lobipanel.js"></script>
+        <script src="bower_components/jquery-ui/jquery-ui.js"></script>
         <script src="bower_components/bootstrap/dist/js/bootstrap.js"></script>
         <script src="bower_components/bootstrap-sidebar/dist/js/sidebar.js"></script>
         <script src="bower_components/bootstrap-map-js/dist/js/bootstrapmap.min.js"></script>
+        
         <!-- endbower -->
         <!-- endbuild -->
 
         <script src="https://js.arcgis.com/3.14/"></script>
-
+        <script type="text/javascript" src="https://txpub.usgs.gov/DSS/search_api/2.0/api/search_api.min.js"></script>
 
         <!-- build:js scripts/combined.js -->
         <script src="scripts/utilities.js"></script>
@@ -58,12 +65,11 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a class="navbar-brand" href="https://www.fws.gov">
-                        <img id="fwsLogo" alt="FWS logo" src="images/fwsLogo.png" style="padding: 10px 0 0 0;">
-                        <a class="navbar-brand" target="_blank" href="https://www.fws.gov/wetlands/index.html">
+                        <img src="images\usgs-logo_left.png">
+                        <a class="navbar-brand" target="_blank" href="#">
                             <div id="titles">
-                                <div class='hidden-lg hidden-md hidden-sm' style='font-size:20px;'>CBRS</div>
-                                <div class='hidden-xs' style='font-size:20px;'>CBRS Projects</div>
-                                <div class='hidden-xs' style='font-size:14px;'>Coastal Barrier Resources System</div>
+                                <div class='hidden-lg hidden-md hidden-sm' style='font-size:20px;'>USGS Regions POC</div>
+                                <div class='hidden-xs' style='font-size:20px; padding-top: 9px;'>USGS Regions POC</div>
                             </div>
                         </a>
                     </a>
@@ -74,7 +80,7 @@
                     <span id="geosearchButtonText"> Find Location</span>
                 </button>
 
-                <button id="printNavButton" type="button" class="btn btn-primary navbar-btn pull-right">
+                <!--<button id="printNavButton" type="button" class="btn btn-primary navbar-btn pull-right">
                     <span class="glyphicon glyphicon-print"></span>
                     <span id="printButtonText"> Print</span>
                 </button>
@@ -82,7 +88,7 @@
                 <button id="getDataButton" type="button" class="btn btn-primary navbar-btn pull-right">
                     <span class="glyphicon glyphicon-cloud-download"></span>
                     <span id="getDataButtonText"> Get Data</span>
-                </button>
+                </button>-->
 
                 <button id="aboutNav" class  ="btn btn-default navbar-btn pull-right">
                     <i class="fa fa-question-circle"></i><span class="hidden-xs">&nbsp;&nbsp;About</span>
@@ -121,178 +127,7 @@
             </div><!-- /.modal-dialog -->
         </div>
 
-        <div class="modal fade overflow-y-hidden" id="printModal" style="display: none;" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
-                        <h4 class="modal-title"><span class="glyphicon glyphicon-print"></span> Print Map</h4>
-                    </div>
-                    <div id="printModalBody" class="modal-body">
-
-                        <form id="print-title-form" class="form-group">
-                            <label for="printTitle">Title </label>
-                            <input class="form-control" id="printTitle" placeholder="Enter a title for your printout">
-                        <!--</form>
-
-                        <form id="print-form" class="form-inline">-->
-                            <button id="printExecuteButton" type="submit" class="btn btn-success btn-fixed" data-loading-text="Printing..." > Print </button>
-                            <button id="printDismissButton" type="button" class="btn btn-default btn-fixed" data-dismiss="modal"> Dismiss</button>
-                        </form>
-
-                        <div id="printJobsDiv" style="margin-top: 5px;"><label>Print Jobs </label><p class="toRemove"> No print jobs yet</p></div>
-                    </div>
-                </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-        </div>
-
-        <div id="getDataModal" class="modal fade"  tabindex="-1" role="dialog" >
-            <div class="modal-dialog  modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <button class="close" type="button" data-dismiss="modal" aria-hidden="true" style="color:gray;">&times;</button>
-                        <h4 class="modal-title">Get Data</h4>
-                    </div>
-                    <div id="getDataModalBody" class="modal-body">
-                        <ul class="nav nav-tabs" id="getDataModalTabs">
-                            <li role="presentation" class="active"><a id="readme" href="#readmeTabPane" data-toggle="tab"><i class="fa fa-question-circle"></i>&nbsp;Readme</a></li>
-                            <li role="presentation" ><a id="watershedTab" href="#watershedTabPane" data-toggle="tab"><i class="fa fa-download"></i>&nbsp;By Watershed</a></li>
-                            <li role="presentation" ><a id="stateTab" href="#stateTabPane" data-toggle="tab"><i class="fa fa-download"></i>&nbsp;By State</a></li>
-                            <li role="presentation" ><a id="webServicesTab" href="#webServicesTabPane" data-toggle="tab"><i class="fa fa-server"></i>&nbsp;Web Services</a></li>
-                        </ul>
-                        <div class="tab-content">
-                            <div role="tabpanel" class="tab-pane active" id="readmeTabPane"></br>
-                                <h3>Before You Begin</h3><br/>
-                                <ul>
-                                    <li>Each State and watershed data download is available as either a compressed file <a target="_blank" href="http://www.esri.com/products/arcgis-capabilities/data-management">Geodatabase</a> or a <a target="_blank" href="http://www.esri.com/library/whitepapers/pdfs/shapefile.pdf">Shapefile</a>. Both files are compressed by using the <a target="_blank" href="https://en.wikipedia.org/wiki/ZIP_file_format">.zip</a> format and contain the following layers:
-                                    <ul><br/>
-                                        <li>Wetlands polygon data - Version 2</li>
-                                        <li>Wetlands Project Metadata - Version 2 (includes image dates and project information)</li>
-                                        <li>Wetlands Historic Map Information*</li>
-                                        <li>Riparian polygon data*</li>
-                                        <li>Riparian Project Metadata (includes image dates and project information)*</li>
-                                        <li>Historic Wetlands*</li>
-                                        <li>Historic Wetlands Project Metadata (includes image dates and project information)*</li>
-                                        <li>Watershed Boundary Dataset (WBD) HUC8 modified** </li><br/>
-                                    </ul>
-                                </ul>
-                                <div style="padding-left: 80px"><p>* If available at the requested location.<br/>** Not included in State downloads.<br/>
-                                Information about each of these layers can be found on our <a target="_blank" href="http://www.fws.gov/wetlands/Data/Metadata.html">Metadata</a> page.</p></div><br/>
-                                <ul>
-                                    <li>Not all of Alaska has been digitally mapped by the U.S. Fish and Wildlife Service. Please refer to the Wetlands Mapper Wetlands Mapping Status layer to view where wetlands have been mapped in Alaska. The state downloads include a Wetlands Project Metadata layer that identifies where and when wetlands were mapped within the state.</li>
-                                </ul>
-                                <h3>Downloading Tips</h3><br/>
-                                <ul>
-                                    <li>If an error occurs during your download, or if your downloaded file(s) is corrupted, we strongly recommend the use of a download manager. Please visit the <a target="_blank" href="http://www.fws.gov/wetlands/FAQs.html#unzip">Frequently Asked Questions</a> page for more information on this topic. For security reasons, we are not allowed to served data via FTP.</li>
-
-                                    <br/><li>Due to the amount of data being downloaded, the resulting time to download each file may take up to 60 minutes or more, and each file can range in sizes from 1MB to approximately 1GB.</li>
-                                </ul>
-                            </div>
-                            <div role="tabpanel" class="tab-pane" id="watershedTabPane"></br>
-                                <h3>Download data by watershed</h3>
-                                <!--<p>The Download by Watershed function is still under development in this application.  Please use the <a target="_blank" href="https://www.fws.gov/wetlands/apps/WetlandsMap/WetlandsMapper.html">NWI V1 Wetlands Mapper</a> to download data by watershed.</p>
-                                --><p>Click on the button below and select the (HUC 8) watershed data you wish to download.</p>
-                                <button id="showHUCs" class="btn btn-primary">Select Watershed</button>
-                            </div>
-                            <div role="tabpanel" class="tab-pane" id="stateTabPane"></br>
-                                <h3>Download data by state</h3>
-                                <p>State data can be obtained here: <a target="_blank" src="http://www.fws.gov/wetlands/Data/State-Downloads.html">http://www.fws.gov/wetlands/Data/State-Downloads.html</a> or, use the pull down menu below to select the state data you wish to download.</p>
-                                <br/>
-                                    <span class="select-wim">
-                                        <label for="stateSelect">Select a state:</label>
-                                        <select id="stateSelect" onchange="stateSelected()">
-                                            <option value="">...</option>
-                                            <option value="AL">Alabama</option>
-                                            <option value="AK">Alaska</option>
-                                            <option value="AZ">Arizona</option>
-                                            <option value="AR">Arkansas</option>
-                                            <option value="CA">California</option>
-                                            <option value="CO">Colorado</option>
-                                            <option value="CT">Connecticut</option>
-                                            <option value="DE">Delaware</option>
-                                            <option value="DC">District Of Columbia</option>
-                                            <option value="FL">Florida</option>
-                                            <option value="GA">Georgia</option>
-                                            <option value="HI">Hawaii</option>
-                                            <option value="ID">Idaho</option>
-                                            <option value="IL">Illinois</option>
-                                            <option value="IN">Indiana</option>
-                                            <option value="IA">Iowa</option>
-                                            <option value="KS">Kansas</option>
-                                            <option value="KY">Kentucky</option>
-                                            <option value="LA">Louisiana</option>
-                                            <option value="ME">Maine</option>
-                                            <option value="MD">Maryland</option>
-                                            <option value="MA">Massachusetts</option>
-                                            <option value="MI">Michigan</option>
-                                            <option value="MN">Minnesota</option>
-                                            <option value="MS">Mississippi</option>
-                                            <option value="MO">Missouri</option>
-                                            <option value="MT">Montana</option>
-                                            <option value="NE">Nebraska</option>
-                                            <option value="NV">Nevada</option>
-                                            <option value="NH">New Hampshire</option>
-                                            <option value="NJ">New Jersey</option>
-                                            <option value="NM">New Mexico</option>
-                                            <option value="NY">New York</option>
-                                            <option value="NC">North Carolina</option>
-                                            <option value="ND">North Dakota</option>
-                                            <option value="OH">Ohio</option>
-                                            <option value="OK">Oklahoma</option>
-                                            <option value="OR">Oregon</option>
-                                            <option value="PA">Pennsylvania</option>
-                                            <option value="RI">Rhode Island</option>
-                                            <option value="SC">South Carolina</option>
-                                            <option value="SD">South Dakota</option>
-                                            <option value="TN">Tennessee</option>
-                                            <option value="TX">Texas</option>
-                                            <option value="UT">Utah</option>
-                                            <option value="VT">Vermont</option>
-                                            <option value="VA">Virginia</option>
-                                            <option value="WA">Washington</option>
-                                            <option value="WV">West Virginia</option>
-                                            <option value="WI">Wisconsin</option>
-                                            <option value="WY">Wyoming</option>
-                                        </select>
-                                        <div id="downloadState"></div>
-                                    </span>
-                                    <br/><b>NOTE:</b> Due to the variation in use and analysis of this data by the end user, each of states wetlands data extends beyond the state boundary. Each state includes wetlands data that intersect the 1:24,000 quadrangles that contain part of that state (1:2,000,000 source data). This allows the user to clip the data to their specific analysis datasets. Beware that two adjacent states will contain some of the same data along their borders.
-                                </p>
-                            </div>
-                            <div role="tabpanel" class="tab-pane" id="webServicesTabPane"></br>
-                                <!--<p>SWI web services available here:</p>
-                                <p><a target="_blank" href="https://fws.wim.usgs.gov/arcgis/rest/services/swi">https://fws.wim.usgs.gov/arcgis/rest/services/swi</a> </p>-->
-                                <p>Many of the data layers on the Wetlands Mapper can be accessed by other applications by using the following web mapping services.</p>
-                                <p><b>REST service address (<a target="_blank" href="https://www.fws.gov/wetlands/Data/Web-Map-Services.html">more info</a>):</b><br/>
-                                    <a target="_blank" href="https://www.fws.gov/wetlands/arcgis/rest/services">https://www.fws.gov/wetlands/arcgis/rest/services</a>
-                                </p>
-                                <p><b>Web Mapping Service (WMS) address (<a target="_blank" href="https://www.fws.gov/wetlands/Data/Web-Map-Services.html">more info</a>):</b><br/>
-                                    <a target="_blank" href="https://www.fws.gov/wetlands/arcgis/services/Wetlands/MapServer/WMSServer?request=GetCapabilities&service=WMS">https://www.fws.gov/wetlands/arcgis/services/Wetlands/MapServer/WMSServer?request=GetCapabilities&service=WMS</a>
-                                </p>
-                                <p><b>Keyhole Markup Language (KML) file (<a target="_blank" href="https://www.fws.gov/wetlands/Data/Google-Earth.html">more info</a>):</b><br/>
-                                    <a target="_blank" href="https://www.fws.gov/wetlands/Data/Google-Earth.html">Wetlands-Data.kml</a>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button class=" btn btn-default close" type="button" data-dismiss="modal" aria-hidden="true" style="color:gray;" class="btn btn-default">Close</button>
-                    </div>
-                </div><!-- /.modal-content -->
-            </div><!-- /.modal-dialog -->
-        </div><!-- /.modal -->
-
-        <div class="wim-alert-fixed" id="huc-download-alert"
-             style="position: fixed; top: 50px; right: 325px; color: #000; background-color: #f9f9f9; border-color: rgba(0,0,0.75);">
-            <i class="ion-close-round close-alert" style="float: right;"></i> <!-- Close Button - MUST INCLUDE -->
-            <div id="innerAlert">
-                <h4><b>Download Data</b></h4>
-                <p>Please review the Data Download (<a target="_blank" href="https://www.fws.gov/wetlands/Data/Data-Download.html">www.fws.gov/wetlands/Data/Data-Download.html</a>) page for information on how to download data, what is included in the download and data use limitations and disclaimer.</p>
-                <br/><p><b>Click the map to select a watershed from which to extract wetland data.</b></p>
-            </div>
-        </div>
-        <script> <!-- To close alert -->
+        <script>
         $(".close-alert").click(function(){
             $(this).parent().slideUp(250);
             map.getLayer("huc8").setVisibility(false);
@@ -310,14 +145,12 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button class="close" type="button" data-dismiss="modal" aria-hidden="true" style="color:gray;">&times;</button>
-                        <h4 class="modal-title">National Wetlands Inventory - V2</h4>
+                        <h3 class="modal-title">&nbsp;&nbsp;About USGS Regions POC</h3>
                     </div>
                     <div id="aboutModalBody" class="modal-body">
                         <ul class="nav nav-tabs" id="aboutModalTabs">
                             <li role="presentation" class="active"><a id="aboutTab" href="#aboutTabPane" data-toggle="tab"><i class="fa fa-question-circle"></i>&nbsp;About the Application</a></li>
-                            <li role="presentation"><a id="disclaimerTab" href="#disclaimerTabPane" data-toggle="tab"><i class="fa fa-exclamation-circle"></i>&nbsp;Disclaimer</a></li>
-                            <li role="presentation"><a id="dataLimitationsTab" href="#dataLimitationsTabPane" data-toggle="tab"><i class="fa fa-exclamation-circle"></i>&nbsp;Data Limitations</a></li>
-                            <li role="presentation"><a id="userCautionTab" href="#userCautionTabPane" data-toggle="tab"><i class="fa fa-exclamation-circle"></i>&nbsp;Wetlands Geodatabase User Caution</a></li>
+                            <li role="presentation"><a id="userCautionTab" href="#contactTab" data-toggle="tab"><i class="fa fa-exclamation-circle"></i>&nbsp;Contact Us</a></li>
                         </ul>
                         <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="aboutTabPane"></br>
@@ -326,37 +159,19 @@
                                 <p>Venison bacon ground round pancetta bresaola pig, pastrami kielbasa frankfurter beef tail. T-bone prosciutto pork doner shoulder chicken chuck beef ribs corned beef tenderloin alcatra kielbasa.</p>
                                 <p>Salami picanha porchetta biltong. Burgdoggen ham hock rump, kevin tail chicken swine doner.</p>
                                 <p>Chuck doner boudin, tongue jerky cupim frankfurter ground round biltong venison.:</p>
-                                <ul class="resources" style="background-color: white; text-align: left">
-                                    <li><a target="_blank" href="http://www.fws.gov/wetlands/Documents/Wetlands-Mapper-Instructions-Manual.pdf">Wetlands Mapper Documentation and Instructions Manual</a> (PDF)</li>
-                                    <li><a target="_blank" href="http://www.fws.gov/wetlands/Documents/Frequently-Asked-Questions-Wetlands-Mapper.pdf">Frequently Asked Questions: Wetlands Mapper</a> (PDF)</li>
-                                    <li><a target="_blank" href="http://www.fws.gov/wetlands/Data/Mapper-Introduction.html">Mapper Introduction</a></li>
-                                    <li>VIDEO: <a target="_blank" href="https://www.youtube.com/watch?feature=player_detailpage&v=CB398gj3O04">How to find and use the U.S Fish and Wildlife Service's Wetlands Mapper</a></li>
-                                </ul>
-                                <br/>
-                                <p>For general questions about CBRS Projects and the Map Viewer: <a target="_blank" href="mailto:Wetlands_Team@fws.gov">need_email@fws.gov</a></p>
+                                <br>
                             </div>
                             <div role="tabpanel" class="tab-pane" id="disclaimerTabPane"></br>
                                 <h3>Disclaimer</h3>
                                 <p>Jerky porchetta sirloin tenderloin chicken rump boudin pastrami flank landjaeger drumstick corned beef sausage. Boudin kevin strip steak picanha short ribs pastrami. Meatloaf cupim kielbasa tenderloin. Shank meatloaf landjaeger pig venison filet mignon short ribs.</p>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="dataLimitationsTabPane"></br>
-                                <h3>Data Limitations</h3>
-                                <p>The Service's objective of mapping wetlands and deepwater habitats is to produce reconnaissance level information on the location, type and size of these resources. The maps are prepared from the analysis of high altitude imagery. Wetlands are identified based on vegetation, visible hydrology and geography. A margin of error is inherent in the use of imagery; thus, detailed on-the-ground inspection of any particular site may result in revision of the wetland boundaries or classification established through image analysis.</p>
-                                <p>The accuracy of image interpretation depends on the quality of the imagery, the experience of the image analysts, the amount and quality of the collateral data and the amount of ground truth verification work conducted. Metadata should be consulted to determine the date of the source imagery used and any mapping problems.</p>
-                                <p>Wetlands or other mapped features may have changed since the date of the imagery and/or field work. There may be occasional differences in polygon boundaries or classifications between the information depicted on the map and the actual conditions on site.</p>
-                                <p><b>Exclusions</b> - Certain wetland habitats are excluded from the National mapping program because of the limitations of aerial imagery as the primary data source used to detect wetlands. These habitats include seagrasses or submerged aquatic vegetation that are found in the intertidal and subtidal zones of estuaries and nearshore coastal waters. Some deepwater reef communities (coral or tuberficid worm reefs) have also been excluded from the inventory. These habitats, because of their depth, go undetected by aerial imagery.</p>
-                                <p>By policy, the Service also excludes certain types of "farmed wetlands" as may be defined by the Food Security Act or that do not coincide with the Cowardin et al. definition. Contact the Service's Regional Wetland Coordinator for additional information on what types of farmed wetlands are included on wetland maps.</p>
-                                <p><b>Precautions</b> - Federal, state, and local regulatory agencies with jurisdiction over wetlands may define and describe wetlands in a different manner than that used in this inventory. There is no attempt, in either the design or products of this inventory, to define the limits of proprietary jurisdiction of any Federal, state, or local government or to establish the geographical scope of the regulatory programs of government agencies. Persons intending to engage in activities involving modifications within or adjacent to wetland areas should seek the advice of appropriate federal, state, or local agencies concerning specified agency regulatory programs and proprietary jurisdictions that may affect such activities.</p>
+                            <div role="tabpanel" class="tab-pane" id="contactTab"></br>
+                                <h3>Contact</h3>
+                                <p>Bacon ipsum dolor amet turkey burgdoggen corned beef, andouille flank ribeye pancetta hamburger venison filet mignon ham hock pork picanha alcatra chuck. Venison bacon ground round pancetta bresaola pig, pastrami kielbasa frankfurter beef tail. T-bone prosciutto pork doner shoulder chicken chuck beef ribs corned beef tenderloin alcatra kielbasa.</p>
+                                <p>Salami picanha porchetta biltong. Burgdoggen ham hock rump, kevin tail chicken swine doner.</p>
+                                <p>Chuck doner boudin, tongue jerky cupim frankfurter ground round biltong venison.:</p>
+                                <div id="info"></div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="userCautionTabPane"></br>
-                                <p>The Wetlands Geodatabase is an ongoing effort consisting of data additions, updates, and other data modifications. All datasets utilized outside of the Wetlands Geodatabase or the Wetlands Mapper and supporting web services are only effective as of the date of extraction or delivery by the Wetlands Geodatabase Administrator. The Wetlands Mapper displays the current status of wetlands data availability.</p>
-                                <p>This data set represents the extent, approximate location and type of wetlands and deepwater habitats in the United States and select U.S. trust territories.</p>
-                                <p>These data were developed in conjunction with the publication Cowardin, L.M., V. Carter, F.C. Golet, and E.T. LaRoe. 1979. Classification of Wetlands and Deepwater Habitats of the United States. U.S. Department of the Interior, Fish and Wildlife Service, Washington, DC. FWS/OBS-79/31. Alpha-numeric map codes have been developed to correspond to the wetland and deepwater classifications described.</p>
-                                <p>These spatial data are not designed to stand alone. They were originally developed as topical overlays to the U.S. Geological Survey 1:24,000 or 1:25,000 scale topographic quadrangles or digital imagery. Note that coastline delineations were drawn to follow the extent of wetland or deepwater features as described by this project and may not match the coastline shown in other base maps. The map products were neither designed nor intended to represent legal or regulatory products.</p>
-                                <p>Comments regarding the interpretation or classification of wetlands or deepwater habitats can be directed to the U.S. Fish and Wildlife Service, Division of Ecological Services or by contacting <a target="_blank" href="Wetlands_Team@fws.gov">Wetlands_Team@fws.gov</a></p>
-                                <p>Any use of trade, product, or firm names is for descriptive purposes only and does not imply endorsement by the U.S. Government. For additional information visit the <a target="_blank" href="http://www.fws.gov/wetlands/Data/Wetlands-V2-Product-Summary.html">product summary</a> and <a target="_blank" href="http://www.fws.gov/wetlands/Data/Metadata.html">metadata</a> web pages.</p>
-                            </div>
-
                         </div>
                     </div>
 
@@ -391,7 +206,7 @@
                                 </a>
                             </h4>
                         </div>
-                        <div id="basemapsPanel" class="panel-collapse collapse" role="tabpanel" aria-labelledby="basemapsHeader">
+                        <div id="basemapsPanel" role="tabpanel" aria-labelledby="basemapsHeader">
                             <div class="panel-body collapse in">
                                 <button id="btnStreets" class="btn btn-default basemapBtn equalize"><img class="basemapThumb" alt="" src="images/streets.jpg"><br class="basemapThumb">Streets</button>
                                 <button id="btnSatellite" class="btn btn-default basemapBtn equalize" ><img class="basemapThumb" alt="" src="images/satellite.jpg"><br class="basemapThumb">Satellite</button>
@@ -407,7 +222,7 @@
 
                         </div>
                     </div>
-                    <div class="panel panel-default wim-sidebar-panel">
+                    <!--<div class="panel panel-default wim-sidebar-panel">
                         <div class="panel-heading" id="layersPanelHeader">
                             <h4 class="panel-title">
                                 <a class="collapsed" data-toggle="collapse" href="#layersPanel" aria-expanded="true" aria-controls="layersPanel">
@@ -418,7 +233,7 @@
                         <div id="layersPanel" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="layersPanelHeader">
                             <div id="toggle" style="padding: 2px 2px;"></div>
                         </div>
-                    </div>
+                    </div>-->
                     <!-- # closing div tag for accordion style panels -->
                     <!--</div>-->
                 </div>

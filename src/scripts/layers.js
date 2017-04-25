@@ -33,12 +33,12 @@ require([
             'showGroupHeading': false,
             'includeInLayerList': true,
             'layers': {
-                'Revised Polygons' : {
+                'USGS Regions' : {
                     'url': 'https://services1.arcgis.com/Hp6G80Pky0om7QvQ/arcgis/rest/services/USGS_Regions/FeatureServer/0?token=DjcX42N0ihSH--P-qYw5815P-YVYlkUM34RJhmOFAP6zuBPMZgYcr5vgDrpbXHUO7xgoIQtxY1upVC5Ro_PSxQj0hOJ_cVaLL1PDiY6GL9neK1F4Zt32o59F4JtVfnz2fAW8UjnX2cf1-nQiNj01agF_zDKFtF6M8xPmIFSZwoaY9O0RAvsWapQ_UwpzTXAN3ZRKGg-nM-tCaqiajg99JyrHABeY18mcw_BOFKTdWnczoYSWaoPigYJz_PU-XhPI',
                     'options': {
-                        'id': 'wetlands',
+                        'id': 'usgsRegions',
                         'opacity': 0.75,
-                        'visible': true
+                        'visible': false
                     },
                     'wimOptions': {
                         'type': 'layer',
@@ -47,7 +47,7 @@ require([
                         'zoomScale': 144448,
                         'hasOpacitySlider': true,
                         'includeLegend' : true,
-                        'moreinfo': 'http://www.fws.gov/wetlands/Data/Wetlands-V2-Product-Summary.html',
+                        'moreinfo': 'https://services1.arcgis.com/Hp6G80Pky0om7QvQ/ArcGIS/rest/services/USGS_Regions/FeatureServer?token=DjcX42N0ihSH--P-qYw5815P-YVYlkUM34RJhmOFAP6zuBPMZgYcr5vgDrpbXHUO7xgoIQtxY1upVC5Ro_PSxQj0hOJ_cVaLL1PDiY6GL9neK1F4Zt32o59F4JtVfnz2fAW8UjnX2cf1-nQiNj01agF_zDKFtF6M8xPmIFSZwoaY9O0RAvsWapQ_UwpzTXAN3ZRKGg-nM-tCaqiajg99JyrHABeY18mcw_BOFKTdWnczoYSWaoPigYJz_PU-XhPI',
                         'otherLayersToggled': ['wetlandsStatus', 'wetlandsRaster']
                     }
                 },
