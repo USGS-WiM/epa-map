@@ -13,6 +13,53 @@ body {
     background-color:#474747;
 }
 
+.nav-branding{
+    display: inline-block;
+    height: 50px;
+}
+.nav-branding img{
+    height: 28px;
+    width: auto;
+    margin-top: 11px;
+    margin-right: 15px;
+    margin-left: 10px;
+}
+.nav-branding a:hover{
+    cursor: pointer;
+}
+.nav-branding a.app-title{
+    color: #FFF;
+    font-weight: 300;
+    font-family: 'Helvetica', 'Arial', sans-serif;
+    font-size: 18px;
+    position: relative;
+    top: 9px;
+}
+@media (max-width: 500px) {
+    .nav-branding img{
+        height: 20px;
+        margin-top: 15px;
+        margin-right: 8px;
+    }    
+    .nav-branding a.app-title{
+        font-size: 12px;
+    }
+}
+@media (max-width: 374px) {
+    .nav-branding a.app-title{
+        font-size: 12px;
+        display: inline-block;
+        width: 70px;
+        position: absolute;
+        top: 0;
+        left: 140px;
+        line-height: 13px;
+        letter-spacing: 0.25px;
+        padding-top: 6px;
+    }
+}
+
+
 #aboutNav {
     /*background-color: #474747;*/
 
@@ -265,7 +312,7 @@ body {
 
 .measurementClass {
     position:absolute;
-    top:10px;
+    top:0px;
     left:45px;
     z-index:3;
     color: black;
@@ -298,11 +345,6 @@ body {
 
 .modal-dialog {
     padding-top: 60px;
-}
-
-.navbar-brand {
-    padding:0px 0px;
-    padding-right: 0px;
 }
 
 .ion-close-round:before {
