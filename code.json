@@ -18,7 +18,7 @@
   
       "homepageURL": "https://wim.usgs.gov",
       "downloadURL": "https://github.com/USGS-WiM/usgs-region-PoC/archive/master.zip",
-      "disclaimerURL": "https://github.com/USGS-WiM/usgs-region-PoC/blob/master/LICENSE.md",
+      "disclaimerURL": "https://github.com/USGS-WiM/usgs-region-PoC/blob/master/DISCLAIMER.md",
       "repositoryUrl": "https://github.com/USGS-WiM/usgs-region-PoC",
       "vcs": "git",
   
